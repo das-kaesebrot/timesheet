@@ -18,7 +18,8 @@ type User struct {
 
 type TimesheetEntry struct {
 	gorm.Model
-	Start  time.Time
-	End    time.Time
-	UserID uint
+	Start       time.Time
+	End         time.Time
+	UserID      uint
+	Description *string
 }
