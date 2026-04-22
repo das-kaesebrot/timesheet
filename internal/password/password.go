@@ -10,8 +10,8 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// VerifyPassword verifies if the given password matches the stored hash.
-func VerifyPassword(password, hash string) bool {
+// PasswordMatches verifies if the given password matches the stored hash.
+func PasswordMatches(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
