@@ -35,12 +35,12 @@ timesheet/
 ## Feature Implementation Plan
 
 ### Phase 1: Foundation
-- [ ] Create `cmd/server/main.go` with `http.ServeMux`
-- [ ] Reuse existing model and password packages
-- [ ] Create the database using existing GORM setup
-- [ ] Create repository layer (User CRUD, TimesheetEntry CRUD)
-- [ ] Create base template with Bootstrap + HTMX
-- [ ] Write HTML templates for all pages
+- [x] Create `cmd/server/main.go` with `http.ServeMux`
+- [x] Reuse existing model and password packages
+- [x] Create the database using existing GORM setup
+- [x] Create repository layer (User CRUD, TimesheetEntry CRUD)
+- [x] Create base template with Bootstrap + HTMX
+- [x] Write HTML templates for all pages
 
 ### Phase 2: User Management Pages
 - [ ] List users page (`GET /users`)

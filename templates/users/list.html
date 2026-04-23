@@ -1,0 +1,32 @@
+{{define "title"}}Users{{end}}
+{{define "content"}}
+<h1>Users</h1>
+<a href="/users/new" class="btn btn-primary mb-3">New User</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Active</th>
+            <th>Weekly Work Hours</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .Users}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Username}}</td>
+            <td>{{if .Active}}Yes{{else}}No{{end}}</td>
+            <td>{{.WeeklyWorkHours}}</td>
+            <td>
+                <a href="/users/{{.ID}}" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="/users/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="/users/{{.ID}}/entries" class="btn btn-sm btn-outline-info">Entries</a>
+                <a href="/users/{{.ID}}/overview" class="btn btn-sm btn-outline-info">Overview</a>
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{end}}

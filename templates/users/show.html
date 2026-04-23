@@ -1,0 +1,19 @@
+{{define "title"}}User: {{.User.Username}}{{end}}
+{{define "content"}}
+<h1>{{.User.Username}}</h1>
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">{{.User.ID}}</dd>
+    <dt class="col-sm-3">Active</dt>
+    <dd class="col-sm-9">{{if .User.Active}}Yes{{else}}No{{end}}</dd>
+    <dt class="col-sm-3">Weekly Work Hours</dt>
+    <dd class="col-sm-9">{{.User.WeeklyWorkHours}}</dd>
+    <dt class="col-sm-3">Granularity</dt>
+    <dd class="col-sm-9">{{if .User.TimesheetGranularity}}{{.User.TimesheetGranularity}}{{else}}None{{end}}</dd>
+</dl>
+<a href="/users/{{.User.ID}}/edit" class="btn btn-primary">Edit</a>
+<a href="/users/{{.User.ID}}/entries" class="btn btn-info">Entries</a>
+<a href="/users/{{.User.ID}}/overview" class="btn btn-info">Overview</a>
+<a href="/users/{{.User.ID}}/export" class="btn btn-success">Export CSV</a>
+<a href="/users" class="btn btn-secondary">Back</a>
+{{end}}

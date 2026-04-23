@@ -1,0 +1,22 @@
+{{define "title"}}New User{{end}}
+{{define "content"}}
+<h1>New User</h1>
+<form method="POST" action="/users">
+    <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Weekly Work Hours</label>
+        <input type="number" name="weekly_work_hours" class="form-control" value="40">
+    </div>
+    <div class="mb-3">
+        <div class="form-check">
+            <input type="checkbox" name="active" class="form-check-input" id="active" checked>
+            <label class="form-check-label" for="active">Active</label>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Create User</button>
+    <a href="/users" class="btn btn-secondary">Cancel</a>
+</form>
+{{end}}
