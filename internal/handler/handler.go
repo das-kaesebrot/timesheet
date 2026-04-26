@@ -32,7 +32,7 @@ func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	h.renderer.Render(w, "users/list", map[string]interface{}{"Users": users})
+	h.renderer.Render(w, "users_list", map[string]interface{}{"Users": users})
 }
 
 func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
@@ -46,11 +46,11 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	h.renderer.Render(w, "users/show", map[string]interface{}{"User": user})
+	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
-	h.renderer.Render(w, "users/new", nil)
+	h.renderer.Render(w, "users_new", nil)
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +78,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user := &model.User{
 		Username:        username,
-		Active:         r.PostForm.Get("active") == "on",
+		Active:          r.PostForm.Get("active") == "on",
 		WeeklyWorkHours: uint8(weeklyWorkHours),
 	}
 
@@ -101,7 +101,7 @@ func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	h.renderer.Render(w, "users/edit", map[string]interface{}{"User": user})
+	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -184,7 +184,7 @@ func (h *Handler) ListUserEntries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.renderer.Render(w, "entries/list", map[string]interface{}{"User": user, "Entries": entries})
+	h.renderer.Render(w, "entries_list", map[string]interface{}{"User": user, "Entries": entries})
 }
 
 func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
@@ -200,7 +200,7 @@ func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.renderer.Render(w, "entries/new", map[string]interface{}{"User": user})
+	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
@@ -291,7 +291,7 @@ func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.renderer.Render(w, "entries/edit", map[string]interface{}{"User": user, "Entry": entry})
+	h.renderer.Render(w, "entries_edit", map[string]interface{}{"User": user, "Entry": entry})
 }
 
 func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
@@ -395,9 +395,9 @@ func (h *Handler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
 type WeeklySummary struct {
 	Week       time.Time
 	StartDate  time.Time
-	EndDate   time.Time
+	EndDate    time.Time
 	TotalHours float64
-	Delta     float64
+	Delta      float64
 }
 
 func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
@@ -447,7 +447,7 @@ func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
 		return summaries[i].StartDate.Before(summaries[j].StartDate)
 	})
 
-	h.renderer.Render(w, "users/overview", map[string]interface{}{"User": user, "Summaries": summaries})
+	h.renderer.Render(w, "users_overview", map[string]interface{}{"User": user, "Summaries": summaries})
 }
 
 func getMondayOfISOWeek(year, week int) time.Time {
