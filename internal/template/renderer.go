@@ -12,7 +12,8 @@ import (
 type Renderer struct {
 	dir       string
 	funcs     template.FuncMap
-	templates *template.Template
+	layouts   *template.Template
+	templates map[string]string
 }
 
 func New(dir string) (*Renderer, error) {
@@ -35,26 +36,26 @@ func New(dir string) (*Renderer, error) {
 		},
 	}
 
-	if err := r.loadTemplates(); err != nil {
-		return nil, err
-	}
-
 	return r, nil
 }
 
-func (r *Renderer) loadTemplates() error {
-	pattern := filepath.Join(r.dir, "*.html")
-	templates, err := template.New("").Funcs(r.funcs).ParseGlob(pattern)
+func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
+	t, err := template.ParseFiles(
+		filepath.Join(r.dir, "layouts", "base.html"),
+		filepath.Join(r.dir, name+".html"))
+
 	if err != nil {
-		return err
+		r.handleError(w, err)
 	}
-	r.templates = templates
-	return nil
+
+	err = t.Funcs(r.funcs).Execute(w, data)
+
+	if err != nil {
+		r.handleError(w, err)
+	}
 }
 
-func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
-	if err := r.templates.ExecuteTemplate(w, name+".html", data); err != nil {
-		fmt.Fprintf(os.Stderr, "template error: %v\n", err)
-		http.Error(w, "Internal Server Error", 500)
-	}
+func (r *Renderer) handleError(w http.ResponseWriter, err error) {
+	fmt.Fprintf(os.Stderr, "template error: %v\n", err)
+	http.Error(w, "Internal Server Error", 500)
 }
