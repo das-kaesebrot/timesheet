@@ -10,8 +10,8 @@ import (
 )
 
 type Renderer struct {
-	dir      string
-	funcs    template.FuncMap
+	dir       string
+	funcs     template.FuncMap
 	templates *template.Template
 }
 
