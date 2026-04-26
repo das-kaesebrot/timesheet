@@ -43,11 +43,11 @@ timesheet/
 - [x] Write HTML templates for all pages
 
 ### Phase 2: User Management Pages
-- [ ] List users page (`GET /users`)
-- [ ] Create user form (`GET /users/new`, `POST /users`)
-- [ ] Edit user form (`GET /users/:id/edit`)
-- [ ] Update user (`PATCH /users/:id`)
-- [ ] Delete user (`DELETE /users/:id`)
+- [x] List users page (`GET /users`)
+- [x] Create user form (`GET /users/new`, `POST /users`)
+- [x] Edit user form (`GET /users/:id/edit`)
+- [x] Update user (`PATCH /users/:id`)
+- [x] Delete user (`DELETE /users/:id`)
 
 ### Phase 3: Timesheet Entry Submission
 - [ ] Submission form (`GET /users/:id/entries/new`)
