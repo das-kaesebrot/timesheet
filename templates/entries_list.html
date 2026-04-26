@@ -1,32 +1,32 @@
 {{define "title"}}Entries for {{.User.Username}}{{end}}
-{{define "content"}}
-<h1>Entries for {{.User.Username}}</h1>
-<a href="/users/{{.User.ID}}/entries/new" class="btn btn-primary mb-3">New Entry</a>
-<a href="/users/{{.User.ID}}" class="btn btn-secondary mb-3">Back to User</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Duration</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Entries}}
-        <tr>
-            <td>{{.ID}}</td>
-            <td>{{.Start.Format "2006-01-02 15:04"}}</td>
-            <td>{{.End.Format "2006-01-02 15:04"}}</td>
-            <td>{{.End.Sub .Start | printf "%.1fh"}}</td>
-            <td>{{if .Description}}{{.Description}}{{end}}</td>
-            <td>
-                <a href="/entries/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+{{define "main"}}
+    <h1>Entries for {{.User.Username}}</h1>
+    <a href="/users/{{.User.ID}}/entries/new" class="btn btn-primary mb-3">New Entry</a>
+    <a href="/users/{{.User.ID}}" class="btn btn-secondary mb-3">Back to User</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Entries}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Start.Format "2006-01-02 15:04"}}</td>
+                <td>{{.End.Format "2006-01-02 15:04"}}</td>
+                <td>{{.End.Sub .Start | printf "%.1fh"}}</td>
+                <td>{{if .Description}}{{.Description}}{{end}}</td>
+                <td>
+                    <a href="/entries/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
 {{end}}

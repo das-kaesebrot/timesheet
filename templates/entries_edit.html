@@ -1,23 +1,23 @@
 {{define "title"}}Edit Entry{{end}}
-{{define "content"}}
-<h1>Edit Entry</h1>
-{{if .User.TimesheetGranularity}}
-<p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
-{{end}}
-<form method="POST" action="/entries/{{.Entry.ID}}?_method=PATCH">
-    <div class="mb-3">
-        <label class="form-label">Start</label>
-        <input type="datetime-local" name="start" class="form-control" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">End</label>
-        <input type="datetime-local" name="end" class="form-control" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control" rows="3">{{if .Entry.Description}}{{.Entry.Description}}{{end}}</textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Update Entry</button>
-    <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
-</form>
+{{define "main"}}
+    <h1>Edit Entry</h1>
+    {{if .User.TimesheetGranularity}}
+    <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
+    {{end}}
+    <form method="POST" action="/entries/{{.Entry.ID}}?_method=PATCH">
+        <div class="mb-3">
+            <label class="form-label">Start</label>
+            <input type="datetime-local" name="start" class="form-control" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">End</label>
+            <input type="datetime-local" name="end" class="form-control" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3">{{if .Entry.Description}}{{.Entry.Description}}{{end}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Entry</button>
+        <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
+    </form>
 {{end}}

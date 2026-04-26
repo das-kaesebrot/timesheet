@@ -1,23 +1,23 @@
 {{define "title"}}New Entry{{end}}
-{{define "content"}}
-<h1>New Entry for {{.User.Username}}</h1>
-{{if .User.TimesheetGranularity}}
-<p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
-{{end}}
-<form method="POST" action="/users/{{.User.ID}}/entries" hx-boost="true">
-    <div class="mb-3">
-        <label class="form-label">Start</label>
-        <input type="datetime-local" name="start" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">End</label>
-        <input type="datetime-local" name="end" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control" rows="3"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Create Entry</button>
-    <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
-</form>
+{{define "main"}}
+    <h1>New Entry for {{.User.Username}}</h1>
+    {{if .User.TimesheetGranularity}}
+    <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
+    {{end}}
+    <form method="POST" action="/users/{{.User.ID}}/entries" hx-boost="true">
+        <div class="mb-3">
+            <label class="form-label">Start</label>
+            <input type="datetime-local" name="start" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">End</label>
+            <input type="datetime-local" name="end" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Entry</button>
+        <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
+    </form>
 {{end}}
