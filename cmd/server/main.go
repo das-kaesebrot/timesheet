@@ -52,11 +52,16 @@ func main() {
 	mux.HandleFunc("PATCH /entries/{id}", h.UpdateEntry)
 	mux.HandleFunc("DELETE /entries/{id}", h.DeleteEntry)
 
-	port := os.Getenv("PORT")
+	host := os.Getenv("TIMESHEET_HOST")
+	if host == "" {
+		host = "[::]"
+	}
+
+	port := os.Getenv("TIMESHEET_PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Starting server on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	log.Printf("Starting server on host %s:%s", host, port)
+	log.Fatal(http.ListenAndServe(host+":"+port, mux))
 }
