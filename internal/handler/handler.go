@@ -11,6 +11,7 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
+	"github.com/das-kaesebrot/timesheet/internal/utility"
 )
 
 type Handler struct {
@@ -71,15 +72,22 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	weeklyWorkHours, _ := strconv.ParseUint(r.PostForm.Get("weekly_work_hours"), 10, 8)
-	if weeklyWorkHours == 0 {
-		weeklyWorkHours = 40
+	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
+	if err != nil {
+		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
+		return
 	}
 
 	user := &model.User{
-		Username:        username,
-		Active:          r.PostForm.Get("active") == "on",
-		WeeklyWorkHours: uint8(weeklyWorkHours),
+		Username:             username,
+		Description:          r.PostForm.Get("description"),
+		Active:               r.PostForm.Get("active") == "on",
+		TimesheetGranularity: parsedDuration.Abs(),
+	}
+
+	parsedWeeklyWorkHours, err := utility.ParseUint8(r.PostForm.Get("weekly_work_hours"))
+	if err == nil {
+		user.WeeklyWorkHours = &parsedWeeklyWorkHours
 	}
 
 	if err := h.repo.CreateUser(r.Context(), user); err != nil {
