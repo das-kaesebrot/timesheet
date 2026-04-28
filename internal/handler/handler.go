@@ -146,9 +146,22 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Active = r.PostForm.Get("active") == "on"
-	if wh, err := strconv.ParseUint(r.PostForm.Get("weekly_work_hours"), 10, 8); err == nil && wh > 0 {
-		user.WeeklyWorkHours = uint8(wh)
+	user.Description = r.PostForm.Get("description")
+
+	parsedWeeklyWorkHours, err := utility.ParseUint8(r.PostForm.Get("weekly_work_hours"))
+	if err != nil {
+		// if an invalid value is given, reset the weekly work hours
+		user.WeeklyWorkHours = nil
+	} else {
+		user.WeeklyWorkHours = &parsedWeeklyWorkHours
 	}
+
+	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
+	if err != nil {
+		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
+		return
+	}
+	user.TimesheetGranularity = parsedDuration.Abs()
 
 	if err := h.repo.UpdateUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
