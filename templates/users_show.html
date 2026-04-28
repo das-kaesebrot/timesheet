@@ -11,7 +11,7 @@
     <dt class="col-sm-3">Weekly Work Time</dt>
     <dd class="col-sm-9">{{.User.WeeklyWorkTime}}</dd>
     <dt class="col-sm-3">Granularity</dt>
-    <dd class="col-sm-9">{{if .User.TimesheetGranularity}}{{.User.TimesheetGranularity}}{{else}}None{{end}}</dd>
+    <dd class="col-sm-9">{{.User.TimesheetGranularity}}</dd>
 </dl>
 <a href="/users/{{.User.ID}}/edit" class="btn btn-primary">Edit</a>
 <a href="/users/{{.User.ID}}/entries" class="btn btn-info">Entries</a>
