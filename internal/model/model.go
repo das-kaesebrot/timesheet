@@ -9,6 +9,7 @@ import (
 type User struct {
 	gorm.Model
 	Username             string
+	Description          string
 	PasswordHash         string
 	Active               bool
 	WeeklyWorkHours      uint8
