@@ -260,13 +260,11 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	duration := end.Sub(start)
-	if user.TimesheetGranularity != nil {
-		minutes := int(duration.Minutes())
-		granularityMinutes := int(user.TimesheetGranularity.Minutes())
-		if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
-			http.Error(w, fmt.Sprintf("Duration must be divisible by %v", user.TimesheetGranularity), http.StatusBadRequest)
-			return
-		}
+	minutes := int(duration.Minutes())
+	granularityMinutes := int(user.TimesheetGranularity.Minutes())
+	if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
+		http.Error(w, fmt.Sprintf("Duration must be divisible by %v", user.TimesheetGranularity), http.StatusBadRequest)
+		return
 	}
 
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(userID))
@@ -357,13 +355,11 @@ func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	duration := end.Sub(start)
-	if user.TimesheetGranularity != nil {
-		minutes := int(duration.Minutes())
-		granularityMinutes := int(user.TimesheetGranularity.Minutes())
-		if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
-			http.Error(w, fmt.Sprintf("Duration must be divisible by %v", user.TimesheetGranularity), http.StatusBadRequest)
-			return
-		}
+	minutes := int(duration.Minutes())
+	granularityMinutes := int(user.TimesheetGranularity.Minutes())
+	if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
+		http.Error(w, fmt.Sprintf("Duration must be divisible by %v", user.TimesheetGranularity), http.StatusBadRequest)
+		return
 	}
 
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), entry.UserID)
@@ -455,7 +451,7 @@ func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
 		}
 		s := weeklyMap[key]
 		s.TotalHours += e.End.Sub(e.Start).Hours()
-		s.Delta = s.TotalHours - float64(user.WeeklyWorkHours)
+		s.Delta = s.TotalHours - float64(*user.WeeklyWorkHours)
 		weeklyMap[key] = s
 	}
 
