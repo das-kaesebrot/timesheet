@@ -435,6 +435,7 @@ func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO whatever the h*ck that ai slopped here, im fixing that
 	weeklyMap := make(map[string]WeeklySummary)
 	for _, e := range entries {
 		year, week := e.Start.ISOWeek()
@@ -450,7 +451,7 @@ func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
 		}
 		s := weeklyMap[key]
 		s.TotalHours += e.End.Sub(e.Start).Hours()
-		s.Delta = s.TotalHours - float64(*user.WeeklyWorkHours)
+		s.Delta = s.TotalHours - float64(user.WeeklyWorkTime)
 		weeklyMap[key] = s
 	}
 
