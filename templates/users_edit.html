@@ -7,8 +7,16 @@
             <input type="text" name="username" class="form-control" value="{{.User.Username}}" required>
         </div>
         <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" name="description" class="form-control" value="{{.User.Description}}" required>
+        </div>
+        <div class="mb-3">
             <label class="form-label">Weekly Work Hours</label>
             <input type="number" name="weekly_work_hours" class="form-control" value="{{.User.WeeklyWorkHours}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Timesheet Granularity</label>
+            <input type="text" name="timesheet_granularity" class="form-control" value="{{.User.TimesheetGranularity}}">
         </div>
         <div class="mb-3">
             <div class="form-check">
