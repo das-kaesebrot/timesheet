@@ -1,7 +1,7 @@
 {{define "title"}}Edit User{{end}}
 {{define "main"}}
     <h1>Edit User: {{.User.Username}}</h1>
-    <form method="POST" action="/users/{{.User.ID}}?_method=PATCH">
+    <form method="POST" action="/users/{{.User.ID}}">
         <div class="mb-3">
             <label class="form-label">Username</label>
             <input type="text" name="username" class="form-control" value="{{.User.Username}}" required>
