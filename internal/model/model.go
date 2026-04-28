@@ -14,7 +14,7 @@ type User struct {
 	Active               bool
 	WeeklyWorkHours      *uint8
 	TimesheetEntries     []TimesheetEntry
-	TimesheetGranularity *time.Duration
+	TimesheetGranularity time.Duration
 }
 
 type TimesheetEntry struct {
