@@ -10,7 +10,6 @@ type User struct {
 	gorm.Model
 	Username             string
 	PasswordHash         string
-	Mail                 *string // can be nullable
 	Active               bool
 	WeeklyWorkHours      uint8
 	TimesheetEntries     []TimesheetEntry
