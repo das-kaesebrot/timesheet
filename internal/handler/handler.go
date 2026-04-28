@@ -11,7 +11,6 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
-	"github.com/das-kaesebrot/timesheet/internal/utility"
 )
 
 type Handler struct {
@@ -77,17 +76,18 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
 		return
 	}
+	parsedWeeklyWorkTime, err := time.ParseDuration(r.PostForm.Get("weekly_work_time"))
+	if err != nil {
+		http.Error(w, "Bad value for weekly work time, has to be a time string!", http.StatusBadRequest)
+		return
+	}
 
 	user := &model.User{
 		Username:             username,
 		Description:          r.PostForm.Get("description"),
 		Active:               r.PostForm.Get("active") == "on",
+		WeeklyWorkTime:       parsedWeeklyWorkTime.Abs(),
 		TimesheetGranularity: parsedDuration.Abs(),
-	}
-
-	parsedWeeklyWorkHours, err := utility.ParseUint8(r.PostForm.Get("weekly_work_hours"))
-	if err == nil {
-		user.WeeklyWorkHours = &parsedWeeklyWorkHours
 	}
 
 	if err := h.repo.CreateUser(r.Context(), user); err != nil {
@@ -148,20 +148,19 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user.Active = r.PostForm.Get("active") == "on"
 	user.Description = r.PostForm.Get("description")
 
-	parsedWeeklyWorkHours, err := utility.ParseUint8(r.PostForm.Get("weekly_work_hours"))
-	if err != nil {
-		// if an invalid value is given, reset the weekly work hours
-		user.WeeklyWorkHours = nil
-	} else {
-		user.WeeklyWorkHours = &parsedWeeklyWorkHours
-	}
-
 	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
 	if err != nil {
 		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
 		return
 	}
 	user.TimesheetGranularity = parsedDuration.Abs()
+
+	parsedWeeklyWorkTime, err := time.ParseDuration(r.PostForm.Get("weekly_work_time"))
+	if err != nil {
+		http.Error(w, "Bad value for weekly work time, has to be a time string!", http.StatusBadRequest)
+		return
+	}
+	user.WeeklyWorkTime = parsedWeeklyWorkTime.Abs()
 
 	if err := h.repo.UpdateUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

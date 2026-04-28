@@ -9,7 +9,7 @@
             <th>Username</th>
             <th>Description</th>
             <th>Active</th>
-            <th>Weekly Work Hours</th>
+            <th>Weekly Work Time</th>
             <th>Timesheet Granularity</th>
             <th>Actions</th>
         </tr>
@@ -21,7 +21,7 @@
             <td>{{.Username}}</td>
             <td>{{.Description}}</td>
             <td>{{if .Active}}Yes{{else}}No{{end}}</td>
-            <td>{{.WeeklyWorkHours}}</td>
+            <td>{{.WeeklyWorkTime}}</td>
             <td>{{.TimesheetGranularity}}</td>
             <td>
                 <a href="/users/{{.ID}}" class="btn btn-sm btn-outline-primary">View</a>

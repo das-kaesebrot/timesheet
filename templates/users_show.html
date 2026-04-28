@@ -8,8 +8,8 @@
     <dd class="col-sm-9">{{.User.Description}}</dd>
     <dt class="col-sm-3">Active</dt>
     <dd class="col-sm-9">{{if .User.Active}}Yes{{else}}No{{end}}</dd>
-    <dt class="col-sm-3">Weekly Work Hours</dt>
-    <dd class="col-sm-9">{{if .User.WeeklyWorkHours}}{{.User.WeeklyWorkHours}}{{else}}None{{end}}</dd>
+    <dt class="col-sm-3">Weekly Work Time</dt>
+    <dd class="col-sm-9">{{.User.WeeklyWorkTime}}</dd>
     <dt class="col-sm-3">Granularity</dt>
     <dd class="col-sm-9">{{if .User.TimesheetGranularity}}{{.User.TimesheetGranularity}}{{else}}None{{end}}</dd>
 </dl>

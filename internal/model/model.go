@@ -12,7 +12,7 @@ type User struct {
 	Description          string
 	PasswordHash         string
 	Active               bool
-	WeeklyWorkHours      *uint8
+	WeeklyWorkTime       time.Duration
 	TimesheetEntries     []TimesheetEntry
 	TimesheetGranularity time.Duration
 }
