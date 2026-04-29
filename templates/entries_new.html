@@ -1,21 +1,71 @@
 {{define "title"}}New Entry{{end}}
 {{define "main"}}
     <h1>New Entry for {{.User.Username}}</h1>
-    {{if .User.TimesheetGranularity}}
     <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
-    {{end}}
-    <form method="POST" action="/users/{{.User.ID}}/entries" hx-boost="true">
-        <div class="mb-3">
-            <label class="form-label">Start</label>
-            <input type="datetime-local" name="start" class="form-control" required>
+    <script>
+        const granularityMillis = {{.User.TimesheetGranularity.Milliseconds}};
+        function setNow(targetName) {
+            const now = Date.now();
+            const date = new Date(now - (now % granularityMillis));
+            document.getElementById(targetName).value = date
+                .toJSON()
+                .substring(0, 16);
+        };
+        function increment(targetName) {
+            document.getElementById(targetName).stepUp();
+        };
+        function decrement(targetName) {
+            document.getElementById(targetName).stepDown();
+        };
+
+        window.onload = (event) => {
+            document.getElementById("button-start-now").addEventListener("click", () => { setNow("input-date-start"); });
+            document.getElementById("button-start-dec").addEventListener("click", () => { decrement("input-date-start"); });
+            document.getElementById("button-start-inc").addEventListener("click", () => { increment("input-date-start"); });
+            document.getElementById("button-end-now").addEventListener("click", () => { setNow("input-date-end"); });
+            document.getElementById("button-end-dec").addEventListener("click", () => { decrement("input-date-end"); });
+            document.getElementById("button-end-inc").addEventListener("click", () => { increment("input-date-end"); });
+        };
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+            }, false)
+        })
+        })()
+    </script>
+    <form method="POST" action="/users/{{.User.ID}}/entries" hx-boost="true" class="needs-validation">
+        <div class="mb-3 input-group">
+            <span class="input-group-text" id="basic-addon1">Start</span>
+            <input type="datetime-local" name="start" id="input-date-start" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" required>
+            <button class="btn btn-outline-secondary" id="button-start-now" type="button">~Now</button>
+            <button class="btn btn-outline-secondary" id="button-start-dec" type="button">-{{.User.TimesheetGranularity}}</button>
+            <button class="btn btn-outline-secondary" id="button-start-inc" type="button">+{{.User.TimesheetGranularity}}</button>
+            <div class="invalid-feedback">Please choose a username.</div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">End</label>
-            <input type="datetime-local" name="end" class="form-control" required>
+        <div class="mb-3 input-group">
+            <span class="input-group-text" id="basic-addon1">End</span>
+            <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" required>
+            <button class="btn btn-outline-secondary" id="button-end-now" type="button">~Now</button>
+            <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{.User.TimesheetGranularity}}</button>
+            <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{.User.TimesheetGranularity}}</button>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3"></textarea>
+        <div class="mb-3 input-group">
+            <span class="input-group-text" id="basic-addon1">Description</span>
+            <input type="text" class="form-control" name="description" aria-describedby="basic-addon3 basic-addon4">
         </div>
         <button type="submit" class="btn btn-primary">Create Entry</button>
         <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
