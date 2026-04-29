@@ -3,6 +3,13 @@
     <h1>Entries for {{.User.Username}}</h1>
     <a href="/users/{{.User.ID}}/entries/new" class="btn btn-primary mb-3">New Entry</a>
     <a href="/users/{{.User.ID}}" class="btn btn-secondary mb-3">Back to User</a>
+    <script>
+        function deleteEntry(id) {
+            fetch("/entries/" + id,  {
+                method: 'DELETE'
+            });
+        }
+    </script>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -20,10 +27,11 @@
                 <td>{{.ID}}</td>
                 <td>{{.Start.Format "2006-01-02 15:04"}}</td>
                 <td>{{.End.Format "2006-01-02 15:04"}}</td>
-                <td>{{.End.Sub .Start | printf "%.1fh"}}</td>
+                <td>{{.End.Sub .Start}}</td>
                 <td>{{if .Description}}{{.Description}}{{end}}</td>
                 <td>
                     <a href="/entries/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="/entries/{{.ID}}/delete" class="btn btn-sm btn-outline-danger">Delete</a>
                 </td>
             </tr>
             {{end}}
