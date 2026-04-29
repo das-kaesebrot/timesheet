@@ -4,7 +4,7 @@
     {{if .User.TimesheetGranularity}}
     <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
     {{end}}
-    <form method="POST" action="/entries/{{.Entry.ID}}?_method=PATCH">
+    <form method="POST" action="/entries/{{.Entry.ID}}">
         <div class="mb-3">
             <label class="form-label">Start</label>
             <input type="datetime-local" name="start" class="form-control" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
