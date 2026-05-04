@@ -30,10 +30,9 @@ func main() {
 
 	h := handler.New(repo, renderer)
 
-	static := http.FileServer(http.Dir("web/static"))
 	mux := http.NewServeMux()
 
-	mux.Handle("/static", static)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 	mux.HandleFunc("/", h.Root)
 
 	mux.HandleFunc("GET /users", h.ListUsers)
