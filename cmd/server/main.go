@@ -23,7 +23,7 @@ func main() {
 	db.AutoMigrate(&model.TimesheetEntry{})
 
 	repo := repository.New(db)
-	renderer, err := template.New("templates")
+	renderer, err := template.New("web/template")
 	if err != nil {
 		log.Panicf("failed to load templates: %v", err)
 	}
