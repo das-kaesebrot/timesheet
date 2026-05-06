@@ -40,10 +40,15 @@ func New(dir string) (*Renderer, error) {
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
-	t, err := template.ParseFiles(
-		filepath.Join(r.dir, "layouts", "base.html"),
-		filepath.Join(r.dir, name+".html"))
+	partials, err := filepath.Glob(filepath.Join(r.dir, "partials", "*.html"))
+	if err != nil {
+		r.handleError(w, err)
+	}
 
+	// ugly but this way we keep the strict order
+	templateFiles := append(append([]string{filepath.Join(r.dir, "layouts", "base.html")}, partials...), filepath.Join(r.dir, name+".html"))
+
+	t, err := template.ParseFiles(templateFiles...)
 	if err != nil {
 		r.handleError(w, err)
 	}
