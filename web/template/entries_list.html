@@ -25,8 +25,8 @@
             {{range .Entries}}
             <tr>
                 <td>{{.ID}}</td>
-                <td>{{.Start.Format "2006-01-02 15:04"}}</td>
-                <td>{{.End.Format "2006-01-02 15:04"}}</td>
+                <td>{{.Start.Format "2006-01-02 15:04 MST"}}</td>
+                <td>{{.End.Format "2006-01-02 15:04 MST"}}</td>
                 <td>{{.End.Sub .Start}}</td>
                 <td>{{if .Description}}{{.Description}}{{end}}</td>
                 <td>

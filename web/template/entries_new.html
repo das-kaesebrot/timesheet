@@ -64,6 +64,14 @@
             <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{.User.TimesheetGranularity}}</button>
         </div>
         <div class="mb-3 input-group">
+            <span class="input-group-text">Timezone</span>
+            <select class="form-select" name="timezone">
+            {{range .Timezones}}
+                <option {{ if (eq . $.User.DefaultTimezone)}}selected {{end}}value="{{ . }}">{{ . }}</option>
+            {{end}}
+            </select>
+        </div>
+        <div class="mb-3 input-group">
             <span class="input-group-text" id="basic-addon1">Description</span>
             <input type="text" class="form-control" name="description" aria-describedby="basic-addon3 basic-addon4">
         </div>

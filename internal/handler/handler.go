@@ -284,13 +284,19 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, err := time.Parse("2006-01-02T15:04", r.PostForm.Get("start"))
+	loc, err := time.LoadLocation(r.PostForm.Get("timezone"))
+	if err != nil {
+		http.Error(w, "error parsing timezone: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	start, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("start"), loc)
 	if err != nil {
 		http.Error(w, "Invalid start time: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	end, err := time.Parse("2006-01-02T15:04", r.PostForm.Get("end"))
+	end, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("end"), loc)
 	if err != nil {
 		http.Error(w, "Invalid end time: "+err.Error(), http.StatusBadRequest)
 		return
@@ -379,13 +385,19 @@ func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, err := time.Parse("2006-01-02T15:04", r.PostForm.Get("start"))
+	loc, err := time.LoadLocation(r.PostForm.Get("timezone"))
+	if err != nil {
+		http.Error(w, "error parsing timezone: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	start, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("start"), loc)
 	if err != nil {
 		http.Error(w, "Invalid start time: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	end, err := time.Parse("2006-01-02T15:04", r.PostForm.Get("end"))
+	end, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("end"), loc)
 	if err != nil {
 		http.Error(w, "Invalid end time: "+err.Error(), http.StatusBadRequest)
 		return
