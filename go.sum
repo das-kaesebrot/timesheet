@@ -1,3 +1,9 @@
+github.com/client9/nowandlater v0.9.0 h1:vTnffesJ7TOh8HS44H/fSCSDtUkuK35Pjy2PLURaoHo=
+github.com/client9/nowandlater v0.9.0/go.mod h1:xSCZh/YNQTYlWKxLadeyTUrfy0KreBL0RD8MmVLTNsw=
+github.com/client9/nowandlater v0.9.1-0.20260430045912-9cd542b760f9 h1:j/J4L9olptAicAOWQ/0VIMUzOGt6WK8MSJPeAvebu/Q=
+github.com/client9/nowandlater v0.9.1-0.20260430045912-9cd542b760f9/go.mod h1:xSCZh/YNQTYlWKxLadeyTUrfy0KreBL0RD8MmVLTNsw=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=

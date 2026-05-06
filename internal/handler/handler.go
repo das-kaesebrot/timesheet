@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
-	"strconv"
 	"time"
 
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
 	"github.com/das-kaesebrot/timesheet/internal/utility"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -37,19 +37,19 @@ func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(id))
+	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
+	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -124,12 +124,12 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
+	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -144,13 +144,13 @@ func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
+	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -214,13 +214,13 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.repo.DeleteUser(r.Context(), uint(id)); err != nil {
+	if err := h.repo.DeleteUser(r.Context(), id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -273,13 +273,13 @@ func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), uint(userID))
+	user, err := h.repo.GetUserByID(r.Context(), userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -321,7 +321,7 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(userID))
+	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
 	for _, e := range existingEntries {
 		if !(end.Before(e.Start) || start.After(e.End)) {
 			http.Error(w, "Time entry overlaps with existing entry", http.StatusBadRequest)
@@ -331,7 +331,7 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 
 	desc := r.PostForm.Get("description")
 	entry := &model.TimesheetEntry{
-		UserID:      uint(userID),
+		UserID:      userID,
 		Start:       start,
 		End:         end,
 		Description: &desc,
@@ -346,13 +346,13 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
 		return
 	}
 
-	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), uint(id))
+	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -368,13 +368,13 @@ func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
 		return
 	}
 
-	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), uint(id))
+	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -447,13 +447,13 @@ func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
 		return
 	}
 
-	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), uint(id))
+	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -461,7 +461,7 @@ func (h *Handler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
 
 	userID := entry.UserID
 
-	if err := h.repo.DeleteTimesheetEntry(r.Context(), uint(id)); err != nil {
+	if err := h.repo.DeleteTimesheetEntry(r.Context(), id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -486,13 +486,13 @@ func getMondayOfISOWeek(year, week int) time.Time {
 }
 
 func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
+	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -513,13 +513,13 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid end date: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		entries, err = h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), uint(id), startTime, endTime)
+		entries, err = h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), id, startTime, endTime)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		entries, err = h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(id))
+		entries, err = h.repo.GetTimesheetEntriesByUserID(r.Context(), id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

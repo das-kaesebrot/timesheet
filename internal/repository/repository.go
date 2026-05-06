@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/das-kaesebrot/timesheet/internal/model"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +21,7 @@ func (r *Repository) CreateUser(ctx context.Context, user *model.User) error {
 	return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *Repository) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
+func (r *Repository) GetUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	var user model.User
 	err := r.db.WithContext(ctx).Preload("TimesheetEntries").First(&user, id).Error
 	if err != nil {
@@ -48,7 +49,7 @@ func (r *Repository) UpdateUser(ctx context.Context, user *model.User) error {
 	return r.db.WithContext(ctx).Save(user).Error
 }
 
-func (r *Repository) DeleteUser(ctx context.Context, id uint) error {
+func (r *Repository) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	return r.db.WithContext(ctx).Delete(&model.User{}, id).Error
 }
 
@@ -56,7 +57,7 @@ func (r *Repository) CreateTimesheetEntry(ctx context.Context, entry *model.Time
 	return r.db.WithContext(ctx).Create(entry).Error
 }
 
-func (r *Repository) GetTimesheetEntryByID(ctx context.Context, id uint) (*model.TimesheetEntry, error) {
+func (r *Repository) GetTimesheetEntryByID(ctx context.Context, id uuid.UUID) (*model.TimesheetEntry, error) {
 	var entry model.TimesheetEntry
 	err := r.db.WithContext(ctx).First(&entry, id).Error
 	if err != nil {
@@ -65,13 +66,13 @@ func (r *Repository) GetTimesheetEntryByID(ctx context.Context, id uint) (*model
 	return &entry, nil
 }
 
-func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uint) ([]model.TimesheetEntry, error) {
+func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) ([]model.TimesheetEntry, error) {
 	var entries []model.TimesheetEntry
 	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("start DESC").Find(&entries).Error
 	return entries, err
 }
 
-func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uint, start, end time.Time) ([]model.TimesheetEntry, error) {
+func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uuid.UUID, start, end time.Time) ([]model.TimesheetEntry, error) {
 	var entries []model.TimesheetEntry
 	end = end.AddDate(0, 0, 1)
 	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, start, end).Order("start DESC").Find(&entries).Error
@@ -82,6 +83,6 @@ func (r *Repository) UpdateTimesheetEntry(ctx context.Context, entry *model.Time
 	return r.db.WithContext(ctx).Save(entry).Error
 }
 
-func (r *Repository) DeleteTimesheetEntry(ctx context.Context, id uint) error {
+func (r *Repository) DeleteTimesheetEntry(ctx context.Context, id uuid.UUID) error {
 	return r.db.WithContext(ctx).Delete(&model.TimesheetEntry{}, id).Error
 }
