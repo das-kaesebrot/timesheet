@@ -43,7 +43,6 @@ func main() {
 	mux.HandleFunc("POST /users/{id}", h.UpdateUser)
 	mux.HandleFunc("DELETE /users/{id}", h.DeleteUser)
 
-	mux.HandleFunc("GET /users/{id}/entries", h.ListUserEntries)
 	mux.HandleFunc("GET /users/{id}/entries/new", h.NewUserEntry)
 	mux.HandleFunc("POST /users/{id}/entries", h.CreateUserEntry)
 

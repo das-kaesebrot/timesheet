@@ -1,7 +1,0 @@
-{{define "title"}}Entries for {{.User.Username}}{{end}}
-{{define "main"}}
-    <h1>Entries for {{.User.Username}}</h1>
-    <a href="/users/{{.User.ID}}/entries/new" class="btn btn-primary mb-3">New Entry</a>
-    <a href="/users/{{.User.ID}}" class="btn btn-secondary mb-3">Back to User</a>
-    {{ template "entries_list" . }}
-{{end}}
