@@ -11,6 +11,7 @@
             <th>Active</th>
             <th>Weekly Work Time</th>
             <th>Timesheet Granularity</th>
+            <th>Default Timezone</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -23,6 +24,7 @@
             <td>{{if .Active}}Yes{{else}}No{{end}}</td>
             <td>{{.WeeklyWorkTime}}</td>
             <td>{{.TimesheetGranularity}}</td>
+            <td>{{.DefaultTimezone}}</td>
             <td>
                 <a href="/users/{{.ID}}" class="btn btn-sm btn-outline-primary">View</a>
                 <a href="/users/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>

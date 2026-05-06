@@ -15,6 +15,7 @@ type User struct {
 	WeeklyWorkTime       time.Duration
 	TimesheetEntries     []TimesheetEntry
 	TimesheetGranularity time.Duration
+	DefaultTimezone      string
 }
 
 type TimesheetEntry struct {
