@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
-	"sort"
 	"strconv"
 	"time"
 
@@ -469,57 +468,6 @@ type WeeklySummary struct {
 	EndDate    time.Time
 	TotalHours float64
 	Delta      float64
-}
-
-func (h *Handler) OverviewUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
-	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(id))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// TODO whatever the h*ck that ai slopped here, im fixing that
-	weeklyMap := make(map[string]WeeklySummary)
-	for _, e := range entries {
-		year, week := e.Start.ISOWeek()
-		key := fmt.Sprintf("%d-W%02d", year, week)
-		if _, ok := weeklyMap[key]; !ok {
-			monday := getMondayOfISOWeek(year, week)
-			friday := monday.AddDate(0, 0, 4)
-			weeklyMap[key] = WeeklySummary{
-				Week:      time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC),
-				StartDate: monday,
-				EndDate:   friday,
-			}
-		}
-		s := weeklyMap[key]
-		s.TotalHours += e.End.Sub(e.Start).Hours()
-		s.Delta = s.TotalHours - float64(user.WeeklyWorkTime)
-		weeklyMap[key] = s
-	}
-
-	var summaries []WeeklySummary
-	for _, s := range weeklyMap {
-		summaries = append(summaries, s)
-	}
-
-	sort.Slice(summaries, func(i, j int) bool {
-		return summaries[i].StartDate.Before(summaries[j].StartDate)
-	})
-
-	h.renderer.Render(w, "users_overview", map[string]interface{}{"User": user, "Summaries": summaries})
 }
 
 func getMondayOfISOWeek(year, week int) time.Time {

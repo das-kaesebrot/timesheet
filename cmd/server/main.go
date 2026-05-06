@@ -47,7 +47,6 @@ func main() {
 	mux.HandleFunc("GET /users/{id}/entries/new", h.NewUserEntry)
 	mux.HandleFunc("POST /users/{id}/entries", h.CreateUserEntry)
 
-	mux.HandleFunc("GET /users/{id}/overview", h.OverviewUser)
 	mux.HandleFunc("GET /users/{id}/export", h.ExportUser)
 
 	mux.HandleFunc("GET /entries/{id}/edit", h.EditEntry)
