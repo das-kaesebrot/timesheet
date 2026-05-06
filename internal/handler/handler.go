@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"sort"
 	"strconv"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
+	"github.com/das-kaesebrot/timesheet/internal/utility"
 )
 
 type Handler struct {
@@ -50,7 +52,12 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
-	h.renderer.Render(w, "users_new", nil)
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	h.renderer.Render(w, "users_new", map[string]interface{}{"Timezones": availableTimezones})
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -82,12 +89,24 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	timezone := r.PostForm.Get("default_timezone")
+	if !slices.Contains(availableTimezones, timezone) {
+		http.Error(w, "Given timezone is not a valid timezone!", http.StatusBadRequest)
+		return
+	}
+
 	user := &model.User{
 		Username:             username,
 		Description:          r.PostForm.Get("description"),
 		Active:               r.PostForm.Get("active") == "on",
 		WeeklyWorkTime:       parsedWeeklyWorkTime.Abs(),
 		TimesheetGranularity: parsedDuration.Abs(),
+		DefaultTimezone:      timezone,
 	}
 
 	if err := h.repo.CreateUser(r.Context(), user); err != nil {
@@ -109,7 +128,13 @@ func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user})
+	timezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
 func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -161,6 +186,18 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.WeeklyWorkTime = parsedWeeklyWorkTime.Abs()
+
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	timezone := r.PostForm.Get("default_timezone")
+	if !slices.Contains(availableTimezones, timezone) {
+		http.Error(w, "Given timezone is not a valid timezone!", http.StatusBadRequest)
+		return
+	}
+	user.DefaultTimezone = timezone
 
 	if err := h.repo.UpdateUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -220,7 +257,13 @@ func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user})
+	timezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
 func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
