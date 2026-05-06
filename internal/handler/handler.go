@@ -42,12 +42,19 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
+
+	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(id))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	user, err := h.repo.GetUserByID(r.Context(), uint(id))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user})
+	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Entries": entries})
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {

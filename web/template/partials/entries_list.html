@@ -1,0 +1,29 @@
+{{define "entries_list"}}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Duration</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .Entries}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Start.Format "2006-01-02 15:04 MST"}}</td>
+            <td>{{.End.Format "2006-01-02 15:04 MST"}}</td>
+            <td>{{.End.Sub .Start}}</td>
+            <td>{{if .Description}}{{.Description}}{{end}}</td>
+            <td>
+                <a href="/entries/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="/entries/{{.ID}}/delete" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{end}}
