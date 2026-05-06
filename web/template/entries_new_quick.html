@@ -1,0 +1,19 @@
+{{define "title"}}New Entry{{end}}
+{{define "main"}}
+    <h1>New Entry (quick) for {{.User.Username}}</h1>
+    <p class="text-muted">Time must be in natural language (<a href="https://github.com/client9/nowandlater#supported-formats" target="_blank">reference</a>)</p>
+    <form method="POST" action="/users/{{.User.ID}}/entries/quick" hx-boost="true" class="needs-validation">
+        <div class="mb-3 input-group">
+            <span class="input-group-text">Start</span>
+            <input type="text" class="form-control" name="natural_language_time_start" required></input>
+            <span class="input-group-text">End</span>
+            <input type="text" class="form-control" name="natural_language_time_end" required></input>
+        </div>
+        <div class="mb-3 input-group">
+            <span class="input-group-text">Description</span>
+            <input type="text" class="form-control" name="description"></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Entry</button>
+        <a href="/users/{{.User.ID}}/entries" class="btn btn-secondary">Cancel</a>
+    </form>
+{{end}}

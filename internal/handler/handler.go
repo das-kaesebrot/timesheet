@@ -7,6 +7,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/client9/nowandlater"
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
@@ -228,36 +229,14 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 
-func (h *Handler) ListUserEntries(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
-	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		return
-	}
-
-	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), uint(id))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	h.renderer.Render(w, "entries_list", map[string]interface{}{"User": user, "Entries": entries})
-}
-
 func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 32)
+	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), uint(id))
+	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -272,6 +251,92 @@ func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
+func (h *Handler) NewUserEntryQuick(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.repo.GetUserByID(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	timezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user, "Timezones": timezones})
+}
+
+func (h *Handler) CreateUserEntryQuick(w http.ResponseWriter, r *http.Request) {
+	userID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.repo.GetUserByID(r.Context(), userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	loc, err := time.LoadLocation(user.DefaultTimezone)
+	if err != nil {
+		http.Error(w, "error parsing timezone: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	p := nowandlater.Parser{Location: loc}
+	start, err := p.Parse(r.PostForm.Get("natural_language_time_start"))
+	if err != nil {
+		http.Error(w, "Error parsing start: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	end, err := p.Parse(r.PostForm.Get("natural_language_time_end"))
+	if err != nil {
+		http.Error(w, "Error parsing end: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if end.Before(start) {
+		http.Error(w, "End time must be after start time", http.StatusBadRequest)
+		return
+	}
+
+	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
+	for _, e := range existingEntries {
+		if !(end.Before(e.Start) || start.After(e.End)) {
+			http.Error(w, "Time entry overlaps with existing entry", http.StatusBadRequest)
+			return
+		}
+	}
+
+	desc := r.PostForm.Get("description")
+	entry := &model.TimesheetEntry{
+		UserID:      userID,
+		Start:       start,
+		End:         end,
+		Description: &desc,
+	}
+
+	if err := h.repo.CreateTimesheetEntry(r.Context(), entry); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
+}
 func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
@@ -475,14 +540,6 @@ type WeeklySummary struct {
 	EndDate    time.Time
 	TotalHours float64
 	Delta      float64
-}
-
-func getMondayOfISOWeek(year, week int) time.Time {
-	jan1 := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	for jan1.Weekday() != time.Monday {
-		jan1 = jan1.AddDate(0, 0, 1)
-	}
-	return jan1.AddDate(0, 0, (week-1)*7)
 }
 
 func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
