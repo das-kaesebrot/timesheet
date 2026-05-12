@@ -19,6 +19,13 @@ var nextWeekStartGetterTests = []struct {
 	{time.Date(2026, 05, 16, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 18, 0, 0, 0, 0, loc)},
 	{time.Date(2026, 05, 17, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 18, 0, 0, 0, 0, loc)},
 	{time.Date(2026, 05, 18, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 18, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 11, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Tuesday, time.Date(2026, 05, 12, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Wednesday, time.Date(2026, 05, 13, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Thursday, time.Date(2026, 05, 14, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Friday, time.Date(2026, 05, 15, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Saturday, time.Date(2026, 05, 16, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Sunday, time.Date(2026, 05, 17, 0, 0, 0, 0, loc)},
 }
 
 func TestNextWeekStartGetter(t *testing.T) {
@@ -43,6 +50,13 @@ var previousWeekStartGetterTests = []struct {
 	{time.Date(2026, 05, 16, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 11, 0, 0, 0, 0, loc)},
 	{time.Date(2026, 05, 17, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 11, 0, 0, 0, 0, loc)},
 	{time.Date(2026, 05, 18, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 18, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Monday, time.Date(2026, 05, 11, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Tuesday, time.Date(2026, 05, 05, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Wednesday, time.Date(2026, 05, 06, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Thursday, time.Date(2026, 05, 07, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Friday, time.Date(2026, 05, 8, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Saturday, time.Date(2026, 05, 9, 0, 0, 0, 0, loc)},
+	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Sunday, time.Date(2026, 05, 10, 0, 0, 0, 0, loc)},
 }
 
 func TestPreviousWeekStartGetter(t *testing.T) {
