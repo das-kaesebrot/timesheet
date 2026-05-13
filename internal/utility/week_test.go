@@ -135,9 +135,9 @@ var weekRangeTests = []struct {
 	{time.Date(2026, 05, 11, 22, 54, 8, 0, loc), time.Date(2026, 05, 16, 22, 54, 8, 0, loc), time.Sunday, []time.Time{}},
 }
 
-func TestGetWeekRange(t *testing.T) {
+func TestGetWeekRangeInWindow(t *testing.T) {
 	for _, tt := range weekRangeTests {
-		result, err := GetWeekRange(tt.inStart, tt.inEnd, tt.weekDay)
+		result, err := GetWeekRangeInWindow(tt.inStart, tt.inEnd, tt.weekDay)
 		if !reflect.DeepEqual(result, tt.expected) || err != nil {
 			t.Errorf("result is not expected value!\nstart=%v\nend=%v\nexpected=%v\nresult=%v\nerr=%v", tt.inStart, tt.inEnd, tt.expected, result, err)
 		}

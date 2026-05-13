@@ -8,7 +8,7 @@ import (
 
 // generates a range of week start dates lying between start (inclusive) and end (exclusive) aligned to the given weekStartDay
 // if a week doesnt start in the range, returns an empty list
-func GetWeekRange(startInclusive time.Time, endExclusive time.Time, weekStartDay time.Weekday) ([]time.Time, error) {
+func GetWeekRangeInWindow(startInclusive time.Time, endExclusive time.Time, weekStartDay time.Weekday) ([]time.Time, error) {
 	outputTimezone := startInclusive.Location()
 	startInclusive = AsUTC(ZeroTimeComponents(startInclusive))
 	endExclusive = AsUTC(ZeroTimeComponents(endExclusive))
@@ -28,13 +28,27 @@ func GetWeekRange(startInclusive time.Time, endExclusive time.Time, weekStartDay
 	diffDays := endExclusive.Sub(startInclusive).Hours() / (24 * 7)
 	weekStartsToGenerate := int(math.Ceil(diffDays))
 
-	weekRange := make([]time.Time, weekStartsToGenerate)
+	return GetWeekRangeByAmountWithLocation(startInclusive, weekStartsToGenerate, weekStartDay, outputTimezone), nil
+}
 
-	for i := range weekStartsToGenerate {
+func GetWeekRangeByAmountWithLocation(startInclusive time.Time, amount int, weekStartDay time.Weekday, outputTimezone *time.Location) []time.Time {
+	weekRange := make([]time.Time, amount)
+
+	for i := range amount {
 		weekRange[i] = AsTimezone(GetNextWeekStartDate(startInclusive.AddDate(0, 0, i*7), weekStartDay), outputTimezone)
 	}
 
-	return weekRange, nil
+	return weekRange
+}
+
+func GetWeekRangeByAmount(startInclusive time.Time, amount int, weekStartDay time.Weekday) []time.Time {
+	weekRange := make([]time.Time, amount)
+
+	for i := range amount {
+		weekRange[i] = GetNextWeekStartDate(startInclusive.AddDate(0, 0, i*7), weekStartDay)
+	}
+
+	return weekRange
 }
 
 // Returns true if given range of dates contains the given weekday at least once.
