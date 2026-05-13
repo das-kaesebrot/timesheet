@@ -1,6 +1,6 @@
 package utility
 
-func Assert[T any](i T, err error) T {
+func assert[T any](i T, err error) T {
 	if err != nil {
 		panic(err)
 	}

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var loc *time.Location = Assert(time.LoadLocation("Europe/Berlin"))
+var loc *time.Location = assert(time.LoadLocation("Europe/Berlin"))
 var nextWeekStartGetterTests = []struct {
 	in           time.Time
 	weekStartDay time.Weekday
