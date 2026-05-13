@@ -32,3 +32,13 @@ func GetPreviousWeekStartDate(start time.Time, weekStartDay time.Weekday) time.T
 func ZeroTimeComponents(toZero time.Time) time.Time {
 	return time.Date(toZero.Year(), toZero.Month(), toZero.Day(), 0, 0, 0, 0, toZero.Location())
 }
+
+// returns a copy of the time with the exact same values, but with the timezone set to UTC
+func AsUTC(toAdjust time.Time) time.Time {
+	return AsTimezone(toAdjust, time.UTC)
+}
+
+// returns a copy of the time with the exact same values, but with the timezone set to loc
+func AsTimezone(toAdjust time.Time, loc *time.Location) time.Time {
+	return time.Date(toAdjust.Year(), toAdjust.Month(), toAdjust.Day(), toAdjust.Hour(), toAdjust.Minute(), toAdjust.Second(), toAdjust.Nanosecond(), loc)
+}
