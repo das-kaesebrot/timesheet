@@ -72,10 +72,16 @@ func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uui
 	return entries, err
 }
 
-func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uuid.UUID, start, end time.Time) ([]model.TimesheetEntry, error) {
+func (r *Repository) GetEarliestTimesheetEntryByUserID(ctx context.Context, userID uuid.UUID) (model.TimesheetEntry, error) {
+	var entry model.TimesheetEntry
+	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("start ASC").First(&entry).Error
+	return entry, err
+}
+
+func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uuid.UUID, startInclusive, endExclusive time.Time) ([]model.TimesheetEntry, error) {
 	var entries []model.TimesheetEntry
-	end = end.AddDate(0, 0, 1)
-	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, start, end).Order("start DESC").Find(&entries).Error
+	endExclusive = endExclusive.AddDate(0, 0, 1)
+	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, startInclusive, endExclusive).Order("start DESC").Find(&entries).Error
 	return entries, err
 }
 

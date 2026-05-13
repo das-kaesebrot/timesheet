@@ -44,18 +44,18 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries, err := h.repo.GetTimesheetEntriesByUserID(r.Context(), id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	user, err := h.repo.GetUserByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Entries": entries})
+	summaries, err := h.GetWeeklySummariesForUser(user, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Summaries": summaries})
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
@@ -534,14 +534,6 @@ func (h *Handler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
 }
 
-type WeeklySummary struct {
-	Week       time.Time
-	StartDate  time.Time
-	EndDate    time.Time
-	TotalHours float64
-	Delta      float64
-}
-
 func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
@@ -594,6 +586,44 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, "%d,%s,%s,%s,%s\n", user.ID, user.Username, e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
 	}
+}
+
+type WeeklySummary struct {
+	WeekNumberISO int
+	StartOfWeek   time.Time
+	EndOfWeek     time.Time
+	TimeLogged    time.Duration
+	Entries       []model.TimesheetEntry
+}
+
+func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]WeeklySummary, error) {
+	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	rangeStart := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
+	rangeEnd := utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+
+	weekStarts, err := utility.GetWeekRangeInWindow(rangeStart, rangeEnd, u.StartOfWeek)
+	if err != nil {
+		return nil, err
+	}
+
+	summaries := make([]WeeklySummary, len(weekStarts))
+
+	for i, startDate := range weekStarts {
+		entriesInWeek, err := h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), u.ID, startDate, startDate.AddDate(0, 0, 7))
+		if err != nil {
+			return nil, err
+		}
+
+		timeLogged := utility.SumEntryDurations(entriesInWeek)
+		_, week := startDate.ISOWeek()
+		summaries[i] = WeeklySummary{WeekNumberISO: week, StartOfWeek: startDate, EndOfWeek: startDate.AddDate(0, 0, 7).Add(-time.Second), TimeLogged: timeLogged, Entries: entriesInWeek}
+	}
+
+	return summaries, nil
 }
 
 type ErrorResponse struct {

@@ -15,6 +15,7 @@ type User struct {
 	PasswordHash         string
 	Active               bool
 	WeeklyWorkTime       time.Duration
+	StartOfWeek          time.Weekday
 	TimesheetEntries     []TimesheetEntry
 	TimesheetGranularity time.Duration
 	DefaultTimezone      string
