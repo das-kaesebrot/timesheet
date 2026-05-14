@@ -1,43 +1,50 @@
 {{define "entries_list"}}
-
 {{range .Summaries}}
-<h2>Week {{.WeekNumberISO}}</h2>
-<dl class="row">
-    <dt class="col-sm-3">Week #</dt>
-    <dd class="col-sm-9">{{.WeekNumberISO}}</dd>
-    <dt class="col-sm-3">Week start</dt>
-    <dd class="col-sm-9">{{.StartOfWeek.Format "2006-01-02 15:04 MST"}}</dd>
-    <dt class="col-sm-3">Week end</dt>
-    <dd class="col-sm-9">{{.EndOfWeek.Format "2006-01-02 15:04 MST"}}</dd>
-    <dt class="col-sm-3">Time logged</dt>
-    <dd class="col-sm-9">{{.TimeLogged}}</dd>
-</dl>            
-<div class="table-responsive">
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Start</th>
-            <th>End</th>
-            <th>Duration</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Entries}}
-        <tr>
-            <td>{{.Start.Format "2006-01-02 15:04 MST"}}</td>
-            <td>{{.End.Format "2006-01-02 15:04 MST"}}</td>
-            <td>{{.End.Sub .Start}}</td>
-            <td>{{if .Description}}{{.Description}}{{end}}</td>
-            <td>
-                <a href="/entries/{{.ID}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                <a href="/entries/{{.ID}}/delete" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+<div class="week-summary mb-4">
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>Week #{{.WeekNumberISO}}</strong> ({{.StartOfWeek.Format "Jan 2"}} - {{.EndOfWeek.Format "Jan 2, 2006"}})
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2 small text-muted">
+                <div class="col-auto">
+                    Time logged: <span class="badge bg-primary fs-6">{{.TimeLogged}}</span>
+                </div>
+            </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Duration</th>
+                    <th>Description</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Entries}}
+                <tr>
+                    <td>{{.Start.Format "Mon, Jan 2"}}</td>
+                    <td>{{.Start.Format "15:04"}}</td>
+                    <td>{{.End.Format "15:04"}}</td>
+                    <td>{{.End.Sub .Start}}</td>
+                    <td>{{.Description}}</td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="/entries/{{.ID}}/edit" class="btn btn-outline-secondary">Edit</a>
+                            <a href="/entries/{{.ID}}/delete" class="btn btn-outline-danger">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+        </div>
+    </div>
 </div>
 {{end}}
 {{end}}
