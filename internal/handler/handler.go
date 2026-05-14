@@ -49,13 +49,20 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	summaries, err := h.GetWeeklySummariesForUser(user, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Summaries": summaries})
+	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Summaries": summaries, "Timezones": availableTimezones})
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
@@ -407,7 +414,7 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%d", userID), http.StatusFound)
 }
 
 func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
