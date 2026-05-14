@@ -593,6 +593,7 @@ type WeeklySummary struct {
 	StartOfWeek   time.Time
 	EndOfWeek     time.Time
 	TimeLogged    time.Duration
+	WeeklyDiff    time.Duration
 	Entries       []model.TimesheetEntry
 }
 
@@ -620,7 +621,7 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]W
 
 		timeLogged := utility.SumEntryDurations(entriesInWeek)
 		_, week := startDate.ISOWeek()
-		summaries[i] = WeeklySummary{WeekNumberISO: week, StartOfWeek: startDate, EndOfWeek: startDate.AddDate(0, 0, 7).Add(-time.Second), TimeLogged: timeLogged, Entries: entriesInWeek}
+		summaries[i] = WeeklySummary{WeekNumberISO: week, StartOfWeek: startDate, EndOfWeek: startDate.AddDate(0, 0, 7).Add(-time.Second), TimeLogged: timeLogged, Entries: entriesInWeek, WeeklyDiff: (timeLogged - u.WeeklyWorkTime)}
 	}
 
 	return summaries, nil
