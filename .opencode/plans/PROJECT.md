@@ -50,25 +50,24 @@ timesheet/
 - [x] Delete user (`DELETE /users/:id`)
 
 ### Phase 3: Timesheet Entry Submission
-- [ ] Submission form (`GET /users/:id/entries/new`)
-- [ ] Create entry (`POST /users/:id/entries`)
-- [ ] Client-side validation for TimesheetGranularity
-- [ ] Server-side validation for TimesheetGranularity
-- [ ] Handle nil TimesheetGranularity (allow any value)
+- [x] Submission form (`GET /users/:id/entries/new`)
+- [x] Create entry (`POST /users/:id/entries`)
+- [x] Client-side validation for TimesheetGranularity
+- [x] Server-side validation for TimesheetGranularity
 
 ### Phase 4: Timesheet Entry Management
-- [ ] List entries page (`GET /users/:id/entries`)
-- [ ] Edit entry form (`GET /entries/:id/edit`)
-- [ ] Update entry (`PATCH /entries/:id`)
-- [ ] Delete entry (`DELETE /entries/:id`)
+- [x] List entries page (`GET /users/:id/entries`)
+- [x] Edit entry form (`GET /entries/:id/edit`)
+- [x] Update entry (`POST /entries/:id/edit`)
+- [x] Delete entry (`POST /entries/:id/delete`)
 
 ### Phase 5: Timesheet Overview
-- [ ] Overview page with weekly summary (`GET /users/:id/overview`)
-- [ ] Calculate weekly sums (Monday-Friday grouped by ISO week)
-- [ ] Calculate delta: `sum hours - user.WeeklyWorkHours`
+- [x] Overview page with weekly summary (`GET /users/:id/overview`)
+- [x] Calculate weekly sums (Monday-Friday grouped by ISO week)
+- [x] Calculate delta: `sum hours - user.WeeklyWorkHours`
 
 ### Phase 6: Export Functionality
-- [ ] CSV export endpoint (`GET /users/:id/export`)
+- [x] CSV export endpoint (`GET /users/:id/export`)
 - [ ] Optional date range filtering (`?start=YYYY-MM-DD&end=YYYY-MM-DD`)
 - [ ] Handle nil granularity (allow any value) for exported entries
 
