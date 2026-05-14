@@ -69,16 +69,10 @@ func ContainsWeekDay(startInclusive time.Time, endExclusive time.Time, weekDay t
 		return true, nil
 	}
 
-	startDay := startInclusive.Weekday()
-	endDay := endExclusive.Weekday()
-	if endDay < startDay {
-		endDay += 7
-	}
-	if weekDay < startDay {
-		weekDay += 7
-	}
+	diffDays := int((weekDay - startInclusive.Weekday() + 7) % 7)
+	firstOccurrence := startInclusive.AddDate(0, 0, diffDays)
 
-	return (startDay <= weekDay && endDay > weekDay), nil
+	return firstOccurrence.Before(endExclusive), nil
 }
 
 // going from the given start time (or rather, the corresponding date), find and return the start of the next week, aligned to the given week start day.
