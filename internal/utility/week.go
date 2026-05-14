@@ -107,6 +107,10 @@ func IsInWeekFromStartDate(start time.Time, timeToCheck time.Time) bool {
 
 // returns a new date from the given date that has the hours, minutes, seconds and nanoseconds components zeroed.
 func ZeroTimeComponents(toZero time.Time) time.Time {
+	// if the components of the given object already are zeroed, dont waste any resources creating a new object
+	if toZero.Hour() == 0 && toZero.Minute() == 0 && toZero.Second() == 0 && toZero.Nanosecond() == 0 {
+		return toZero
+	}
 	return time.Date(toZero.Year(), toZero.Month(), toZero.Day(), 0, 0, 0, 0, toZero.Location())
 }
 
@@ -117,5 +121,8 @@ func AsUTC(toAdjust time.Time) time.Time {
 
 // returns a copy of the time with the exact same values, but with the timezone set to loc
 func AsTimezone(toAdjust time.Time, loc *time.Location) time.Time {
+	if toAdjust.Location() == loc {
+		return toAdjust
+	}
 	return time.Date(toAdjust.Year(), toAdjust.Month(), toAdjust.Day(), toAdjust.Hour(), toAdjust.Minute(), toAdjust.Second(), toAdjust.Nanosecond(), loc)
 }

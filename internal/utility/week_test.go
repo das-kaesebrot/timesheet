@@ -101,6 +101,7 @@ var asUTCtests = []struct {
 }{
 	{time.Date(2026, 05, 12, 22, 54, 8, 0, loc), time.Date(2026, 05, 12, 22, 54, 8, 0, time.UTC)},
 	{time.Date(2026, 03, 29, 03, 0, 0, 0, loc), time.Date(2026, 03, 29, 03, 0, 0, 0, time.UTC)},
+	{time.Date(2026, 03, 29, 03, 0, 0, 0, time.UTC), time.Date(2026, 03, 29, 03, 0, 0, 0, time.UTC)},
 }
 
 func TestAsUTC(t *testing.T) {
