@@ -1,24 +1,89 @@
 {{define "title"}}User: {{.User.Username}}{{end}}
+
 {{define "main"}}
-<h1>{{.User.Username}}</h1>
-<dl class="row">
-    <dt class="col-sm-3">ID</dt>
-    <dd class="col-sm-9">{{.User.ID}}</dd>
-    <dt class="col-sm-3">Description</dt>
-    <dd class="col-sm-9">{{.User.Description}}</dd>
-    <dt class="col-sm-3">Active</dt>
-    <dd class="col-sm-9">{{if .User.Active}}Yes{{else}}No{{end}}</dd>
-    <dt class="col-sm-3">Weekly Work Time</dt>
-    <dd class="col-sm-9">{{.User.WeeklyWorkTime}}</dd>
-    <dt class="col-sm-3">Granularity</dt>
-    <dd class="col-sm-9">{{.User.TimesheetGranularity}}</dd>
-</dl>
-<a href="/users/{{.User.ID}}/edit" class="btn btn-primary">Edit</a>
-<a href="/users/{{.User.ID}}/entries" class="btn btn-info">Entries</a>
-<a href="/users/{{.User.ID}}/entries/new" class="btn btn-info">New Entry</a>
-<a href="/users/{{.User.ID}}/entries/new/quick" class="btn btn-primary">New Entry (quick)</a>
-<a href="/users/{{.User.ID}}/export" class="btn btn-success">Export CSV</a>
-<a href="/users" class="btn btn-secondary">Back</a>
-<h2>Entries</h2>
-{{ template "entries_list" . }}
+<div class="container py-4" style="max-width: 900px;">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
+                <div>
+                    <h1 class="h2 mb-1">{{.User.Username}}</h1>
+                    <p class="text-muted mb-0">
+                        <code>{{.User.ID}}</code>
+                    </p>
+                </div>
+
+                <div class="mt-2 mt-md-0">
+                    {{if .User.Active}}
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2">
+                            Active
+                        </span>
+                    {{else}}
+                        <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis px-3 py-2">
+                            Inactive
+                        </span>
+                    {{end}}
+                </div>
+            </div>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted">Description</dt>
+                <dd class="col-sm-8">
+                    {{if .User.Description}}
+                        {{.User.Description}}
+                    {{else}}
+                        <span class="text-muted fst-italic">
+                            No description provided
+                        </span>
+                    {{end}}
+                </dd>
+                <dt class="col-sm-4 text-muted">Weekly Work Time</dt>
+                <dd class="col-sm-8">
+                    <span class="badge bg-primary-subtle text-primary-emphasis">
+                        {{.User.WeeklyWorkTime}}
+                    </span>
+                </dd>
+                <dt class="col-sm-4 text-muted">Timesheet Granularity</dt>
+                <dd class="col-sm-8">
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                        {{.User.TimesheetGranularity}}
+                    </span>
+                </dd>
+            </dl>
+            <div class="d-flex flex-wrap gap-2 border-top pt-3">
+                <a href="/users/{{.User.ID}}/edit"
+                   class="btn btn-sm btn-primary">
+                    Edit
+                </a>
+                <a href="/users/{{.User.ID}}/export"
+                   class="btn btn-sm btn-outline-dark">
+                    Export CSV
+                </a>
+                <a href="/users"
+                   class="btn btn-sm btn-light border ms-auto">
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center gap-2">
+            <a href="/users/{{.User.ID}}/entries"
+                class="btn btn-sm btn-outline-primary">
+                <h3 class="h5 mb-0">Entries</h3>
+            </a>            
+            <a href="/users/{{.User.ID}}/entries/new"
+               class="btn btn-sm btn-primary ms-auto">
+                Add Entry
+            </a>
+            <a href="/users/{{.User.ID}}/entries/new/quick"
+                class="btn btn-sm btn-warning text-dark">
+                Quick Entry
+            </a>
+        </div>
+        <div class="card-body">
+            {{ template "entries_list" . }}
+        </div>
+    </div>
+</div>
 {{end}}
