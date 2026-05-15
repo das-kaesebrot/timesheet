@@ -45,30 +45,25 @@ This application uses Open Source components. You can find the source code of th
 
 ### [GORM SQLite Driver](https://github.com/go-gorm/sqlite)
 
-- Copyright (c) [GORM](https://github.com/go-gorm) and contributors
-- [MIT License](https://github.com/go-gorm/sqlite/blob/master/LICENSE)
+- Copyright (c) 2013-present [jinzhu](https://github.com/jinzhu) and contributors
+- [MIT License](https://github.com/go-gorm/sqlite/blob/master/License)
 
-### [go-sqlite3](https://github.com/mattn/go-sqlite3)
+### [uuid](https://github.com/google/uuid)
 
-- Copyright (c) 2014 [Yasuhiro Matsumoto](https://github.com/mattn) and contributors
-- [MIT License](https://github.com/mattn/go-sqlite3/blob/master/LICENSE)
-
-### [google/uuid](https://github.com/google/uuid)
-
-- Copyright (c) 2009 The Go Authors and contributors
-- [BSD 3-Clause License](https://github.com/google/uuid/blob/master/LICENSE)
+- Copyright (c) 2009,2014 Google Inc
+- [BSD33-Clause License](https://github.com/google/uuid/blob/master/LICENSE)
 
 ### [nowandlater](https://github.com/client9/nowandlater)
 
-- Copyright (c) 2025 [Nick Galbreath](https://github.com/client9) and contributors
+- Copyright (c) 2026 [Nick Galbreath](https://github.com/client9)
 - [MIT License](https://github.com/client9/nowandlater/blob/master/LICENSE)
 
-### [golang.org/x/crypto](https://go.googlesource.com/crypto)
+### [golang.org/x/crypto](https://pkg.go.dev/golang.org/x/crypto)
 
-- Copyright (c) 2009 The Go Authors and contributors
-- [BSD 3-Clause License](https://go.googlesource.com/crypto/+/master/LICENSE)
+- Copyright (c) 2009 The Go Authors
+- [BSD33-Clause License](https://go.googlesource.com/crypto/+//master/LICENSE)
 
-### [golang.org/x/text](https://go.googlesource.com/text)
+### [golang.org/x/text](https://pkg.go.dev/golang.org/x/text)
 
-- Copyright (c) 2009 The Go Authors and contributors
-- [BSD 3-Clause License](https://go.googlesource.com/text/+/master/LICENSE)
+- Copyright (c) 2009 The Go Authors
+- [BSD-3-Clause License](https://go.googlesource.com/text/+/master/LICENSE)
