@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                         {{range .Users}}
-                        <tr>
+                        <tr onclick="window.location='/users/{{.ID}}'" style="cursor: pointer;" role="button">
                             <td class="ps-4">
                                 <strong>{{.Name}}</strong>
                             </td>
@@ -35,9 +35,8 @@
                             <td>{{.WeeklyWorkTime}}</td>
                             <td>{{.TimesheetGranularity}}</td>
                             <td class="text-muted">{{.DefaultTimezone}}</td>
-                            <td class="text-end pe-4">
+                            <td class="text-end pe-4" onclick="event.stopPropagation()">
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="/users/{{.ID}}" class="btn btn-outline-primary">View</a>
                                     <a href="/users/{{.ID}}/edit" class="btn btn-outline-secondary">Edit</a>
                                     <a href="/users/{{.ID}}/entries" class="btn btn-outline-info">Entries</a>
                                     <a href="/users/{{.ID}}/delete" class="btn btn-outline-danger">Delete</a>
