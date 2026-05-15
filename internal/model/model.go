@@ -9,9 +9,8 @@ import (
 
 type User struct {
 	gorm.Model
-	ID                   uuid.UUID
-	Username             string
-	Description          string
+	ID                   uuid.UUID `gorm:"type:uuid"`
+	Name                 string
 	PasswordHash         string
 	Active               bool
 	WeeklyWorkTime       time.Duration

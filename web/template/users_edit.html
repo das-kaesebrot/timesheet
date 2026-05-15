@@ -1,14 +1,10 @@
 {{define "title"}}Edit User{{end}}
 {{define "main"}}
-    <h1>Edit User: {{.User.Username}}</h1>
+    <h1>Edit User: {{.User.ID}}</h1>
     <form method="POST" action="/users/{{.User.ID}}">
         <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input type="text" name="username" class="form-control" value="{{.User.Username}}" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Description</label>
-            <input type="text" name="description" class="form-control" value="{{.User.Description}}" required>
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" value="{{.User.Name}}" required>
         </div>
         <div class="mb-3">
             <label class="form-label">Weekly Work Time</label>

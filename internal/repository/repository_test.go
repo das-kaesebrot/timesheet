@@ -29,8 +29,7 @@ func setupTestDB(t *testing.T) *Repository {
 func setupUser(t *testing.T, repo *Repository, username string) *model.User {
 	t.Helper()
 	user := &model.User{
-		Username:             username,
-		Description:          "test user",
+		Name:                 username,
 		Active:               true,
 		WeeklyWorkTime:       40 * time.Hour,
 		TimesheetGranularity: 15 * time.Minute,
@@ -61,8 +60,8 @@ func TestGetUserByID(t *testing.T) {
 		t.Fatalf("GetUserByID failed: %v", err)
 	}
 
-	if got.Username != "testuser" {
-		t.Errorf("expected username 'testuser', got '%s'", got.Username)
+	if got.Name != "testuser" {
+		t.Errorf("expected username 'testuser', got '%s'", got.Name)
 	}
 	if got.ID != created.ID {
 		t.Errorf("expected ID %v, got %v", created.ID, got.ID)
@@ -73,29 +72,6 @@ func TestGetUserByIDNotFound(t *testing.T) {
 	repo := setupTestDB(t)
 
 	_, err := repo.GetUserByID(context.Background(), uuid.Nil)
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		t.Errorf("expected ErrRecordNotFound, got %v", err)
-	}
-}
-
-func TestGetUserByUsername(t *testing.T) {
-	repo := setupTestDB(t)
-	created := setupUser(t, repo, "uniqueuser")
-
-	got, err := repo.GetUserByUsername(context.Background(), "uniqueuser")
-	if err != nil {
-		t.Fatalf("GetUserByUsername failed: %v", err)
-	}
-
-	if got.ID != created.ID {
-		t.Errorf("expected ID %v, got %v", created.ID, got.ID)
-	}
-}
-
-func TestGetUserByUsernameNotFound(t *testing.T) {
-	repo := setupTestDB(t)
-
-	_, err := repo.GetUserByUsername(context.Background(), "nonexistent")
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		t.Errorf("expected ErrRecordNotFound, got %v", err)
 	}
@@ -129,8 +105,7 @@ func TestUpdateUser(t *testing.T) {
 	repo := setupTestDB(t)
 	user := setupUser(t, repo, "beforeupdate")
 
-	user.Username = "afterupdate"
-	user.Description = "updated description"
+	user.Name = "afterupdate"
 	if err := repo.UpdateUser(context.Background(), user); err != nil {
 		t.Fatalf("UpdateUser failed: %v", err)
 	}
@@ -140,11 +115,8 @@ func TestUpdateUser(t *testing.T) {
 		t.Fatalf("GetUserByID after update failed: %v", err)
 	}
 
-	if got.Username != "afterupdate" {
-		t.Errorf("expected username 'afterupdate', got '%s'", got.Username)
-	}
-	if got.Description != "updated description" {
-		t.Errorf("expected description 'updated description', got '%s'", got.Description)
+	if got.Name != "afterupdate" {
+		t.Errorf("expected username 'afterupdate', got '%s'", got.Name)
 	}
 }
 

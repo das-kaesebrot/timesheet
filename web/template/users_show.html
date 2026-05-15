@@ -1,4 +1,4 @@
-{{define "title"}}User: {{.User.Username}}{{end}}
+{{define "title"}}User: {{.User.ID}}{{end}}
 
 {{define "main"}}
 <div class="container py-4" style="max-width: 900px;">
@@ -6,7 +6,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
                 <div>
-                    <h1 class="h2 mb-1">{{.User.Username}}</h1>
+                    <h1 class="h2 mb-1"></h1>
                     <p class="text-muted mb-0">
                         <code>{{.User.ID}}</code>
                     </p>
@@ -25,15 +25,9 @@
                 </div>
             </div>
             <dl class="row mb-4">
-                <dt class="col-sm-4 text-muted">Description</dt>
+                <dt class="col-sm-4 text-muted">Name</dt>
                 <dd class="col-sm-8">
-                    {{if .User.Description}}
-                        {{.User.Description}}
-                    {{else}}
-                        <span class="text-muted fst-italic">
-                            No description provided
-                        </span>
-                    {{end}}
+                    {{.User.Name}}
                 </dd>
                 <dt class="col-sm-4 text-muted">Weekly Work Time</dt>
                 <dd class="col-sm-8">

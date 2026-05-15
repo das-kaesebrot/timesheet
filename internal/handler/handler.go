@@ -130,18 +130,11 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.PostForm.Get("username")
-	if username == "" {
-		http.Error(w, "Username is required", http.StatusBadRequest)
+	name := r.PostForm.Get("name")
+	if name == "" {
+		http.Error(w, "Name is required", http.StatusBadRequest)
 		return
 	}
-
-	existing, _ := h.repo.GetUserByUsername(r.Context(), username)
-	if existing != nil {
-		http.Error(w, "Username already exists", http.StatusBadRequest)
-		return
-	}
-
 	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
 	if err != nil {
 		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
@@ -165,8 +158,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &model.User{
-		Username:             username,
-		Description:          r.PostForm.Get("description"),
+		Name:                 name,
 		Active:               r.PostForm.Get("active") == "on",
 		WeeklyWorkTime:       parsedWeeklyWorkTime.Abs(),
 		TimesheetGranularity: parsedDuration.Abs(),
@@ -219,31 +211,18 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.PostForm.Get("username")
-	if username == "" {
-		http.Error(w, "Username is required", http.StatusBadRequest)
+	name := r.PostForm.Get("name")
+	if name == "" {
+		http.Error(w, "Name is required", http.StatusBadRequest)
 		return
 	}
-
-	if username != user.Username {
-		existing, _ := h.repo.GetUserByUsername(r.Context(), username)
-		if existing != nil && existing.ID != user.ID {
-			http.Error(w, "Username already exists", http.StatusBadRequest)
-			return
-		}
-		user.Username = username
-	}
-
 	user.Active = r.PostForm.Get("active") == "on"
-	user.Description = r.PostForm.Get("description")
-
 	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
 	if err != nil {
 		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
 		return
 	}
 	user.TimesheetGranularity = parsedDuration.Abs()
-
 	parsedWeeklyWorkTime, err := time.ParseDuration(r.PostForm.Get("weekly_work_time"))
 	if err != nil {
 		http.Error(w, "Bad value for weekly work time, has to be a time string!", http.StatusBadRequest)
@@ -268,7 +247,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d", id), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", id.String()), http.StatusFound)
 }
 
 func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -641,7 +620,7 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
 		if e.Description != nil {
 			desc = *e.Description
 		}
-		fmt.Fprintf(w, "%d,%s,%s,%s,%s\n", user.ID, user.Username, e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
+		fmt.Fprintf(w, "%d,%s,%s,%s,%s\n", user.ID, user.Name, e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
 	}
 }
 
@@ -655,6 +634,15 @@ type WeeklySummary struct {
 }
 
 func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]WeeklySummary, error) {
+	amountEntries, err := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if amountEntries <= 0 {
+		return nil, nil
+	}
+
 	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
 	if err != nil {
 		return nil, err

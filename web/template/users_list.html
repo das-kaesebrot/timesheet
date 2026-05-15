@@ -6,8 +6,7 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>Username</th>
-            <th>Description</th>
+            <th>Name</th>
             <th>Active</th>
             <th>Weekly Work Time</th>
             <th>Timesheet Granularity</th>
@@ -19,8 +18,7 @@
         {{range .Users}}
         <tr>
             <td>{{.ID}}</td>
-            <td>{{.Username}}</td>
-            <td>{{.Description}}</td>
+            <td>{{.Name}}</td>
             <td>{{if .Active}}Yes{{else}}No{{end}}</td>
             <td>{{.WeeklyWorkTime}}</td>
             <td>{{.TimesheetGranularity}}</td>
