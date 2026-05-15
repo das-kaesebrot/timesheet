@@ -33,6 +33,12 @@ func New(dir string) (*Renderer, error) {
 				hours := d.Hours()
 				return fmt.Sprintf("%.1f", hours)
 			},
+			"add": func(a, b int) int {
+				return a + b
+			},
+			"sub": func(a, b int) int {
+				return a - b
+			},
 		},
 	}
 
@@ -48,12 +54,13 @@ func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) 
 	// ugly but this way we keep the strict order
 	templateFiles := append(append([]string{filepath.Join(r.dir, "layouts", "base.html")}, partials...), filepath.Join(r.dir, name+".html"))
 
-	t, err := template.ParseFiles(templateFiles...)
+	t := template.New("base.html").Funcs(r.funcs)
+	t, err = t.ParseFiles(templateFiles...)
 	if err != nil {
 		r.handleError(w, err)
 	}
 
-	err = t.Funcs(r.funcs).Execute(w, data)
+	err = t.Execute(w, data)
 
 	if err != nil {
 		r.handleError(w, err)
