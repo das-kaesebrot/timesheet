@@ -17,5 +17,6 @@
         </main>
 
         <script src="{{ if .StaticLibsDir }}{{ .StaticLibsDir }}{{ else }}/static/libs{{ end }}/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ if .StaticScriptsDir }}{{ .StaticScriptsDir }}{{ else }}/static/js{{end}}/script.js"></script>
     </body>
 </html>
