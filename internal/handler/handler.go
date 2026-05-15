@@ -25,11 +25,12 @@ func New(repo *repository.Repository, renderer *template.Renderer) *Handler {
 	return &Handler{repo: repo, renderer: renderer}
 }
 
+// catchall route
 func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 
-func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUsersList(w http.ResponseWriter, r *http.Request) {
 	users, err := h.repo.ListUsers(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,7 +39,7 @@ func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "users_list", map[string]interface{}{"Users": users})
 }
 
-func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -115,7 +116,7 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUserNew(w http.ResponseWriter, r *http.Request) {
 	availableTimezones, err := utility.GetAllTimezones(true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -124,7 +125,7 @@ func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "users_new", map[string]interface{}{"Timezones": availableTimezones})
 }
 
-func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostUserNew(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -173,7 +174,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 
-func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUserEdit(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -193,7 +194,7 @@ func (h *Handler) EditUser(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
-func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostUserUpdate(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -250,7 +251,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/users/%s", id.String()), http.StatusFound)
 }
 
-func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostUserDelete(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -265,7 +266,7 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 
-func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetEntryNew(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -287,7 +288,7 @@ func (h *Handler) NewUserEntry(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
-func (h *Handler) NewUserEntryQuick(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -309,7 +310,7 @@ func (h *Handler) NewUserEntryQuick(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user, "Timezones": timezones})
 }
 
-func (h *Handler) CreateUserEntryQuick(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostEntryNewQuick(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -373,7 +374,7 @@ func (h *Handler) CreateUserEntryQuick(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
 }
-func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -446,7 +447,7 @@ func (h *Handler) CreateUserEntry(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/users/%d", userID), http.StatusFound)
 }
 
-func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetEntryEdit(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
@@ -468,7 +469,7 @@ func (h *Handler) EditEntry(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "entries_edit", map[string]interface{}{"User": user, "Entry": entry})
 }
 
-func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
@@ -547,7 +548,7 @@ func (h *Handler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", entry.UserID), http.StatusFound)
 }
 
-func (h *Handler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
