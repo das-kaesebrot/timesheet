@@ -10,14 +10,7 @@
     <script src="{{ if .StaticLibsDir }}{{ .StaticLibsDir }}{{ else }}/static/libs{{ end }}/htmx.org@2.0.10/dist/htmx.min.js"></script>
 </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="/">{{ template "brand" . }}</a>
-                <div class="navbar-nav">
-                    <a class="nav-link" href="/users">Users</a>
-                </div>
-            </div>
-        </nav>
+        {{template "navbar" .}}
 
         <main class="container mt-4">
             {{template "main" .}}
