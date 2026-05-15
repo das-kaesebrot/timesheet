@@ -41,7 +41,7 @@ func main() {
 	mux.HandleFunc("GET /users/{id}", h.GetUserOverview)
 	mux.HandleFunc("GET /users/{id}/edit", h.GetUserEdit)
 	mux.HandleFunc("POST /users/{id}", h.PostUserUpdate)
-	mux.HandleFunc("DELETE /users/{id}", h.PostUserDelete)
+	mux.HandleFunc("GET /users/{id}/delete", h.PostUserDelete)
 
 	mux.HandleFunc("GET /users/{id}/entries/new", h.GetEntryNew)
 	mux.HandleFunc("GET /users/{id}/entries/new/quick", h.GetEntryNewQuick)
@@ -49,6 +49,7 @@ func main() {
 	mux.HandleFunc("POST /users/{id}/entries/quick", h.PostEntryNewQuick)
 
 	mux.HandleFunc("GET /users/{id}/export", h.ExportUser)
+	//mux.HandleFunc("POST /users/{id}/import", h.PostEntryNew)
 
 	mux.HandleFunc("GET /entries/{id}/edit", h.GetEntryEdit)
 	mux.HandleFunc("POST /entries/{id}", h.PostEntryUpdate)
