@@ -52,12 +52,6 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	summaries, err := h.GetWeeklySummariesForUser(user, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -107,7 +101,6 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) {
 	h.renderer.Render(w, "users_show", map[string]interface{}{
 		"User":               user,
 		"Summaries":          pageSummaries,
-		"Timezones":          availableTimezones,
 		"Page":               page,
 		"PerPage":            perPage,
 		"AvailablePageSizes": availablePageSizes,
@@ -117,12 +110,7 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUserNew(w http.ResponseWriter, r *http.Request) {
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	h.renderer.Render(w, "users_new", map[string]interface{}{"Timezones": availableTimezones})
+	h.renderer.Render(w, "users_new", map[string]interface{}{})
 }
 
 func (h *Handler) PostUserNew(w http.ResponseWriter, r *http.Request) {
@@ -185,13 +173,8 @@ func (h *Handler) GetUserEdit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	timezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
-	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user, "Timezones": timezones})
+	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) PostUserUpdate(w http.ResponseWriter, r *http.Request) {
@@ -279,13 +262,7 @@ func (h *Handler) GetEntryNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user, "Timezones": timezones})
+	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) {
@@ -301,13 +278,7 @@ func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user, "Timezones": timezones})
+	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) PostEntryNewQuick(w http.ResponseWriter, r *http.Request) {

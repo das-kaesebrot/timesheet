@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/das-kaesebrot/timesheet/internal/utility"
 )
 
 type Renderer struct {
@@ -57,9 +59,24 @@ func New(dir string) (*Renderer, error) {
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	partials, err := filepath.Glob(filepath.Join(r.dir, "partials", "*.html"))
 	if err != nil {
 		r.handleError(w, err)
+	}
+
+	if dataMap, ok := data.(map[string]interface{}); ok {
+		version := os.Getenv("VERSION")
+		if version == "" {
+			version = "dev"
+		}
+		dataMap["Version"] = version
+		dataMap["Timezones"] = availableTimezones
 	}
 
 	// ugly but this way we keep the strict order
