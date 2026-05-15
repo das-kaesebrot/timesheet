@@ -634,12 +634,7 @@ type WeeklySummary struct {
 }
 
 func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]WeeklySummary, error) {
-	amountEntries, err := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if amountEntries <= 0 {
+	if h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID) <= 0 {
 		return nil, nil
 	}
 
