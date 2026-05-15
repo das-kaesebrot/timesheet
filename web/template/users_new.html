@@ -16,12 +16,13 @@
         </div>
         <div class="mb-3 input-group">
             <span class="input-group-text">Default Timezone</span>
-            <select class="form-select" name="default_timezone">
+            <select class="form-select" name="default_timezone" id="defaultTimezone">
             {{range .Timezones}}
                 <option value="{{ . }}">{{ . }}</option>
             {{end}}
             </select>
         </div>
+        <script>document.getElementById('defaultTimezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone</script>
         <div class="mb-3">
             <div class="form-check">
                 <input type="checkbox" name="active" class="form-check-input" id="active" checked>
