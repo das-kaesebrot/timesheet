@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strconv"
 	"time"
 
 	"github.com/client9/nowandlater"
@@ -62,7 +63,56 @@ func (h *Handler) ShowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.renderer.Render(w, "users_show", map[string]interface{}{"User": user, "Summaries": summaries, "Timezones": availableTimezones})
+	availablePageSizes := []int{1, 5, 10}
+	page := 1
+	perPage := 5
+	if queryPage := r.URL.Query().Get("page"); queryPage != "" {
+		if n, err := strconv.Atoi(queryPage); err == nil && n > 0 {
+			page = n
+		}
+	}
+	if queryPerPage := r.URL.Query().Get("per_page"); queryPerPage != "" {
+		if n, err := strconv.Atoi(queryPerPage); err == nil {
+			for item, _ := range availablePageSizes {
+				if item == n {
+					perPage = n
+				}
+			}
+		}
+	}
+
+	totalSummaries := len(summaries)
+	totalPages := (totalSummaries + perPage - 1) / perPage
+	if totalPages == 0 {
+		totalPages = 1
+	}
+
+	// overflow protection
+	if page > totalPages {
+		page = totalPages
+	}
+
+	start := (page - 1) * perPage
+	if start > totalSummaries {
+		start = totalSummaries
+	}
+	end := start + perPage
+	if end > totalSummaries {
+		end = totalSummaries
+	}
+
+	pageSummaries := summaries[start:end]
+
+	h.renderer.Render(w, "users_show", map[string]interface{}{
+		"User":               user,
+		"Summaries":          pageSummaries,
+		"Timezones":          availableTimezones,
+		"Page":               page,
+		"PerPage":            perPage,
+		"AvailablePageSizes": availablePageSizes,
+		"TotalPages":         totalPages,
+		"TotalSummaries":     totalSummaries,
+	})
 }
 
 func (h *Handler) NewUser(w http.ResponseWriter, r *http.Request) {

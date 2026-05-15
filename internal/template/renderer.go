@@ -39,6 +39,17 @@ func New(dir string) (*Renderer, error) {
 			"sub": func(a, b int) int {
 				return a - b
 			},
+			"seq": func(start, end int) []int {
+				n := end - start + 1
+				if n <= 0 {
+					return nil
+				}
+				s := make([]int, n)
+				for i := range s {
+					s[i] = start + i
+				}
+				return s
+			},
 		},
 	}
 

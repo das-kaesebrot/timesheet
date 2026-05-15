@@ -65,6 +65,7 @@ timesheet/
 - [x] Overview page with weekly summary (`GET /users/:id/overview`)
 - [x] Calculate weekly sums (Monday-Friday grouped by ISO week)
 - [x] Calculate delta: `sum hours - user.WeeklyWorkHours`
+- [x] Pagination with configurable weeks per page (1, 5, 10) via `?page=&per_page=`
 
 ### Phase 6: Export Functionality
 - [x] CSV export endpoint (`GET /users/:id/export`)
