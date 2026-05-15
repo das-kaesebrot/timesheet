@@ -9,10 +9,10 @@
     <link href="{{ if .StaticLibsDir }}{{ .StaticLibsDir }}{{ else }}/static/libs{{ end }}/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{{ if .StaticLibsDir }}{{ .StaticLibsDir }}{{ else }}/static/libs{{ end }}/htmx.org@2.0.10/dist/htmx.min.js"></script>
 </head>
-    <body>
+    <body class="d-flex flex-column min-vh-100">
         {{template "navbar" .}}
 
-        <main class="container mt-4">
+        <main class="container mt-4 flex-grow-1">
             {{template "main" .}}
         </main>
 
