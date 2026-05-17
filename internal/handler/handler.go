@@ -68,7 +68,7 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) {
 	}
 	if queryPerPage := r.URL.Query().Get("per_page"); queryPerPage != "" {
 		if n, err := strconv.Atoi(queryPerPage); err == nil {
-			for item, _ := range availablePageSizes {
+			for item := range availablePageSizes {
 				if item == n {
 					perPage = n
 				}
