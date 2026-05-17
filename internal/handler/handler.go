@@ -343,7 +343,7 @@ func (h *Handler) PostEntryNewQuick(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s/entries", userID.String()), http.StatusFound)
 }
 func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(r.PathValue("id"))
@@ -415,7 +415,7 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d", userID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", userID.String()), http.StatusFound)
 }
 
 func (h *Handler) GetEntryEdit(w http.ResponseWriter, r *http.Request) {
@@ -516,7 +516,7 @@ func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", entry.UserID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s/entries", entry.UserID.String()), http.StatusFound)
 }
 
 func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) {
@@ -539,7 +539,7 @@ func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%d/entries", userID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", userID.String()), http.StatusFound)
 }
 
 func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
