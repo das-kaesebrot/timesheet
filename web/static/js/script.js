@@ -19,13 +19,13 @@
     var toggle = document.getElementById('themeToggle');
     var icon = document.getElementById('themeIcon');
     if (toggle) {
-        icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        icon.textContent = theme === 'dark' ? '☀️' : '🌖';
         toggle.addEventListener('click', function () {
             var current = document.documentElement.getAttribute('data-bs-theme');
             var next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-bs-theme', next);
             localStorage.setItem(key, next);
-            icon.textContent = next === 'dark' ? '☀️' : '🌙';
+            icon.textContent = next === 'dark' ? '☀️' : '🌖';
         });
     }
 }()
