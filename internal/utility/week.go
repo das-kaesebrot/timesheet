@@ -14,7 +14,7 @@ func GetWeekRangeInWindow(startInclusive time.Time, endExclusive time.Time, week
 	endExclusive = AsUTC(ZeroTimeComponents(endExclusive))
 
 	if endExclusive.Equal(startInclusive) || endExclusive.Before(startInclusive) {
-		return nil, errors.New("end date can't be equal or before start date!")
+		return nil, errors.New("ContainsWeekDay: end date can't be equal or before start date!")
 	}
 
 	containsWeekDay, err := ContainsWeekDay(startInclusive, endExclusive, weekStartDay)
@@ -59,7 +59,7 @@ func ContainsWeekDay(startInclusive time.Time, endExclusive time.Time, weekDay t
 	endExclusive = AsUTC(ZeroTimeComponents(endExclusive))
 
 	if endExclusive.Equal(startInclusive) || endExclusive.Before(startInclusive) {
-		return false, errors.New("end date can't be equal or before start date!")
+		return false, errors.New("ContainsWeekDay: end date can't be equal or before start date!")
 	}
 
 	diff := endExclusive.Sub(startInclusive)
