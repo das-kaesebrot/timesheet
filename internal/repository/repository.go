@@ -57,10 +57,10 @@ func (r *Repository) GetTimesheetEntryByID(ctx context.Context, id uuid.UUID) (*
 	return &entry, nil
 }
 
-func (r *Repository) CountTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) int64 {
+func (r *Repository) CountTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) (int64, error) {
 	var count int64
-	r.db.WithContext(ctx).Where("user_id = ?", userID).Count(&count)
-	return count
+	err := r.db.WithContext(ctx).Model(&model.TimesheetEntry{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
 }
 
 func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) ([]model.TimesheetEntry, error) {

@@ -606,7 +606,11 @@ type WeeklySummary struct {
 }
 
 func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]WeeklySummary, error) {
-	if h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID) <= 0 {
+	entries, err := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID)
+	if err != nil {
+		return nil, err
+	}
+	if entries <= 0 {
 		return nil, nil
 	}
 
@@ -617,6 +621,10 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]W
 
 	rangeStart := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
 	rangeEnd := utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+
+	if rangeEnd.Equal(rangeStart) {
+		rangeEnd = rangeEnd.AddDate(0, 0, 1)
+	}
 
 	weekStarts, err := utility.GetWeekRangeInWindow(rangeStart, rangeEnd, u.StartOfWeek)
 	if err != nil {
