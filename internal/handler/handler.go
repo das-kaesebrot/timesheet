@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strconv"
 	"time"
@@ -118,41 +119,14 @@ func (h *Handler) PostUserNew(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	name := r.PostForm.Get("name")
-	if name == "" {
-		http.Error(w, "Name is required", http.StatusBadRequest)
-		return
-	}
-	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
+	userUpdate, err := parseUserForm(r.PostForm)
 	if err != nil {
-		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
-		return
-	}
-	parsedWeeklyWorkTime, err := time.ParseDuration(r.PostForm.Get("weekly_work_time"))
-	if err != nil {
-		http.Error(w, "Bad value for weekly work time, has to be a time string!", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	timezone := r.PostForm.Get("default_timezone")
-	if !slices.Contains(availableTimezones, timezone) {
-		http.Error(w, "Given timezone is not a valid timezone!", http.StatusBadRequest)
-		return
-	}
-
-	user := &model.User{
-		Name:                 name,
-		Active:               r.PostForm.Get("active") == "on",
-		WeeklyWorkTime:       parsedWeeklyWorkTime.Abs(),
-		TimesheetGranularity: parsedDuration.Abs(),
-		DefaultTimezone:      timezone,
-	}
+	user := &model.User{}
+	user.UpdateFromForm(userUpdate)
 
 	if err := h.repo.CreateUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -183,49 +157,17 @@ func (h *Handler) PostUserUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
-
 	user, err := h.repo.GetUserByID(r.Context(), id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	name := r.PostForm.Get("name")
-	if name == "" {
-		http.Error(w, "Name is required", http.StatusBadRequest)
-		return
-	}
-	user.Active = r.PostForm.Get("active") == "on"
-	parsedDuration, err := time.ParseDuration(r.PostForm.Get("timesheet_granularity"))
+	userUpdate, err := parseUserForm(r.PostForm)
 	if err != nil {
-		http.Error(w, "Bad value for timesheet granularity, has to be a time string!", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user.TimesheetGranularity = parsedDuration.Abs()
-	parsedWeeklyWorkTime, err := time.ParseDuration(r.PostForm.Get("weekly_work_time"))
-	if err != nil {
-		http.Error(w, "Bad value for weekly work time, has to be a time string!", http.StatusBadRequest)
-		return
-	}
-	user.WeeklyWorkTime = parsedWeeklyWorkTime.Abs()
-
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	timezone := r.PostForm.Get("default_timezone")
-	if !slices.Contains(availableTimezones, timezone) {
-		http.Error(w, "Given timezone is not a valid timezone!", http.StatusBadRequest)
-		return
-	}
-	user.DefaultTimezone = timezone
-
+	user.UpdateFromForm(userUpdate)
 	if err := h.repo.UpdateUser(r.Context(), user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -642,6 +584,50 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]W
 	}
 
 	return summaries, nil
+}
+
+func parseUserForm(form url.Values) (*model.UserUpdate, error) {
+	var userUpdate = new(model.UserUpdate)
+
+	userUpdate.Name = form.Get("name")
+
+	parsedDuration, err := time.ParseDuration(form.Get("timesheet_granularity"))
+	if err != nil {
+		return nil, fmt.Errorf("Bad value for timesheet granularity, has to be a time string! %w", err)
+	}
+	parsedDuration = parsedDuration.Abs()
+	userUpdate.TimesheetGranularity = &parsedDuration
+
+	parsedWeeklyWorkTime, err := time.ParseDuration(form.Get("weekly_work_time"))
+	if err != nil {
+		return nil, fmt.Errorf("Bad value for weekly work time, has to be a time string! %w", err)
+	}
+	parsedWeeklyWorkTime = parsedWeeklyWorkTime.Abs()
+	userUpdate.WeeklyWorkTime = &parsedWeeklyWorkTime
+
+	n, err := strconv.Atoi(form.Get("week_start_day"))
+	if err != nil {
+		return nil, err
+	}
+	if n < 0 || n > int(time.Saturday) {
+		return nil, fmt.Errorf("Week day has to be between 0 and 6! Given value: %d", n)
+	}
+	parsedWeekStartDay := time.Weekday(n)
+	userUpdate.StartOfWeek = &parsedWeekStartDay
+
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+	timezone := form.Get("default_timezone")
+	if !slices.Contains(availableTimezones, timezone) {
+		return nil, fmt.Errorf("Given timezone is not a valid timezone! %w", err)
+	}
+	userUpdate.DefaultTimezone = timezone
+
+	userUpdate.Active = form.Get("active") == "on"
+
+	return userUpdate, nil
 }
 
 type ErrorResponse struct {
