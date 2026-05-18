@@ -41,7 +41,7 @@ func main() {
 	mux.HandleFunc("GET /users/{id}", h.GetUserOverview)
 	mux.HandleFunc("GET /users/{id}/edit", h.GetUserEdit)
 	mux.HandleFunc("POST /users/{id}", h.PostUserUpdate)
-	mux.HandleFunc("GET /users/{id}/delete", h.PostUserDelete)
+	mux.HandleFunc("POST /users/{id}/delete", h.PostUserDelete)
 
 	mux.HandleFunc("GET /users/{id}/entries/new", h.GetEntryNew)
 	mux.HandleFunc("GET /users/{id}/entries/new/quick", h.GetEntryNewQuick)

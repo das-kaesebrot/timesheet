@@ -16,7 +16,14 @@
                 <a href="/users/{{.User.ID}}/export" class="btn btn-sm btn-outline-secondary">Export CSV</a>
                 <a href="/users/{{.User.ID}}/import" class="btn btn-sm btn-outline-secondary">Import CSV</a>
                 <a href="/users/{{.User.ID}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a href="/users/{{.User.ID}}/delete" class="btn btn-sm btn-outline-danger">Delete</a>
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteUserModal"
+                        data-user-id="{{.User.ID}}"
+                        data-user-name="{{.User.Name}}">
+                    Delete
+                </button>
             </div>
         </div>
         <div class="card-body">
@@ -88,4 +95,6 @@
         </div>
     </div>
 </div>
+
+{{ template "delete_user_modal" . }}
 {{end}}

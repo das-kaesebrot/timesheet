@@ -39,7 +39,14 @@
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="/users/{{.ID}}/edit" class="btn btn-outline-secondary">Edit</a>
                                     <a href="/users/{{.ID}}/entries" class="btn btn-outline-info">Entries</a>
-                                    <a href="/users/{{.ID}}/delete" class="btn btn-outline-danger">Delete</a>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteUserModal"
+                                            data-user-id="{{.ID}}"
+                                            data-user-name="{{.Name}}">
+                                        Delete
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -55,6 +62,8 @@
         </div>
     </div>
 </div>
+
+{{ template "delete_user_modal" . }}
 
 <div class="modal"
      id="newUserModal"
