@@ -30,7 +30,7 @@
 <script>document.getElementById('defaultTimezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone</script>
 <div class="mb-3 input-group">
     <div class="form-check">
-        <input type="checkbox" name="active" class="form-check-input" id="active" {{if .User.Active}}checked{{end}}>
+        <input type="checkbox" name="active" class="form-check-input" id="active" {{if (or (not .User) .User.Active)}}checked{{end}}>
         <label class="form-check-label" for="active">Active</label>
     </div>
 </div>
