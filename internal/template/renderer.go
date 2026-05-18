@@ -16,6 +16,8 @@ type Renderer struct {
 	funcs     template.FuncMap
 	layouts   *template.Template
 	templates map[string]string
+	weekdays  []time.Weekday
+	timezones []string
 }
 
 func New(dir string) (*Renderer, error) {
@@ -53,18 +55,19 @@ func New(dir string) (*Renderer, error) {
 				return s
 			},
 		},
+		weekdays: utility.GetWeekdays(),
 	}
+
+	availableTimezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		return nil, err
+	}
+	r.timezones = availableTimezones
 
 	return r, nil
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	partials, err := filepath.Glob(filepath.Join(r.dir, "partials", "*.html"))
 	if err != nil {
 		r.handleError(w, err)
@@ -76,7 +79,8 @@ func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) 
 			version = "dev"
 		}
 		dataMap["Version"] = version
-		dataMap["Timezones"] = availableTimezones
+		dataMap["Timezones"] = r.timezones
+		dataMap["Weekdays"] = r.weekdays
 	}
 
 	// ugly but this way we keep the strict order
