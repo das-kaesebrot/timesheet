@@ -144,7 +144,7 @@ func TestCreateTimesheetEntry(t *testing.T) {
 		UserID:      user.ID,
 		Start:       now,
 		End:         now.Add(8 * time.Hour),
-		Description: &desc,
+		Description: desc,
 	}
 
 	if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
@@ -166,7 +166,7 @@ func TestGetTimesheetEntryByID(t *testing.T) {
 		UserID:      user.ID,
 		Start:       now,
 		End:         now.Add(4 * time.Hour),
-		Description: &desc,
+		Description: desc,
 	}
 	if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
@@ -202,7 +202,7 @@ func TestGetTimesheetEntriesByUserID(t *testing.T) {
 			UserID:      user.ID,
 			Start:       now.Add(time.Duration(i) * 24 * time.Hour),
 			End:         now.Add(time.Duration(i)*24*time.Hour + time.Hour),
-			Description: &desc,
+			Description: desc,
 		}
 		if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 			t.Fatalf("CreateTimesheetEntry failed: %v", err)
@@ -247,8 +247,8 @@ func TestGetEarliestTimesheetEntryByUserID(t *testing.T) {
 	desc1 := "later"
 	desc2 := "earlier"
 
-	entry1 := &model.TimesheetEntry{UserID: user.ID, Start: now.Add(2 * time.Hour), End: now.Add(3 * time.Hour), Description: &desc1}
-	entry2 := &model.TimesheetEntry{UserID: user.ID, Start: now, End: now.Add(1 * time.Hour), Description: &desc2}
+	entry1 := &model.TimesheetEntry{UserID: user.ID, Start: now.Add(2 * time.Hour), End: now.Add(3 * time.Hour), Description: desc1}
+	entry2 := &model.TimesheetEntry{UserID: user.ID, Start: now, End: now.Add(1 * time.Hour), Description: desc2}
 
 	if err := repo.CreateTimesheetEntry(context.Background(), entry1); err != nil {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
@@ -285,10 +285,10 @@ func TestGetTimesheetEntriesByUserIDInRange(t *testing.T) {
 	desc := "entry"
 
 	entries := []*model.TimesheetEntry{
-		{UserID: user.ID, Start: now, End: now.Add(1 * time.Hour), Description: &desc},
-		{UserID: user.ID, Start: now.Add(24 * time.Hour), End: now.Add(25 * time.Hour), Description: &desc},
-		{UserID: user.ID, Start: now.Add(48 * time.Hour), End: now.Add(49 * time.Hour), Description: &desc},
-		{UserID: user.ID, Start: now.Add(72 * time.Hour), End: now.Add(73 * time.Hour), Description: &desc},
+		{UserID: user.ID, Start: now, End: now.Add(1 * time.Hour), Description: desc},
+		{UserID: user.ID, Start: now.Add(24 * time.Hour), End: now.Add(25 * time.Hour), Description: desc},
+		{UserID: user.ID, Start: now.Add(48 * time.Hour), End: now.Add(49 * time.Hour), Description: desc},
+		{UserID: user.ID, Start: now.Add(72 * time.Hour), End: now.Add(73 * time.Hour), Description: desc},
 	}
 
 	for _, e := range entries {
@@ -332,14 +332,14 @@ func TestUpdateTimesheetEntry(t *testing.T) {
 		UserID:      user.ID,
 		Start:       now,
 		End:         now.Add(8 * time.Hour),
-		Description: &desc,
+		Description: desc,
 	}
 	if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
 	}
 
 	newDesc := "updated"
-	entry.Description = &newDesc
+	entry.Description = newDesc
 	entry.End = now.Add(6 * time.Hour)
 	if err := repo.UpdateTimesheetEntry(context.Background(), entry); err != nil {
 		t.Fatalf("UpdateTimesheetEntry failed: %v", err)
@@ -350,8 +350,8 @@ func TestUpdateTimesheetEntry(t *testing.T) {
 		t.Fatalf("GetTimesheetEntryByID after update failed: %v", err)
 	}
 
-	if *got.Description != "updated" {
-		t.Errorf("expected description 'updated', got '%s'", *got.Description)
+	if got.Description != "updated" {
+		t.Errorf("expected description 'updated', got '%s'", got.Description)
 	}
 	if got.End != now.Add(6*time.Hour) {
 		t.Errorf("expected end %v, got %v", now.Add(6*time.Hour), got.End)
@@ -368,7 +368,7 @@ func TestDeleteTimesheetEntry(t *testing.T) {
 		UserID:      user.ID,
 		Start:       now,
 		End:         now.Add(1 * time.Hour),
-		Description: &desc,
+		Description: desc,
 	}
 	if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
@@ -395,7 +395,7 @@ func TestPreloadTimesheetEntries(t *testing.T) {
 			UserID:      user.ID,
 			Start:       now,
 			End:         now.Add(1 * time.Hour),
-			Description: &desc,
+			Description: desc,
 		}
 		if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 			t.Fatalf("CreateTimesheetEntry failed: %v", err)
@@ -422,7 +422,7 @@ func TestDeleteUserDoesNotDeleteEntries(t *testing.T) {
 		UserID:      user.ID,
 		Start:       now,
 		End:         now.Add(1 * time.Hour),
-		Description: &desc,
+		Description: desc,
 	}
 	if err := repo.CreateTimesheetEntry(context.Background(), entry); err != nil {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)

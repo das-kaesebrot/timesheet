@@ -26,7 +26,7 @@ type TimesheetEntry struct {
 	Start       time.Time
 	End         time.Time
 	UserID      uuid.UUID
-	Description *string
+	Description string
 }
 
 // Note: Gorm will fail if the function signature

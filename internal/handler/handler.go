@@ -335,7 +335,7 @@ func (h *Handler) PostEntryNewQuick(w http.ResponseWriter, r *http.Request) {
 		UserID:      userID,
 		Start:       start,
 		End:         end,
-		Description: &desc,
+		Description: desc,
 	}
 
 	if err := h.repo.CreateTimesheetEntry(r.Context(), entry); err != nil {
@@ -407,7 +407,7 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 		UserID:      userID,
 		Start:       start,
 		End:         end,
-		Description: &desc,
+		Description: desc,
 	}
 
 	if err := h.repo.CreateTimesheetEntry(r.Context(), entry); err != nil {
@@ -509,7 +509,7 @@ func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) {
 	entry.Start = start
 	entry.End = end
 	desc := r.PostForm.Get("description")
-	entry.Description = &desc
+	entry.Description = desc
 
 	if err := h.repo.UpdateTimesheetEntry(r.Context(), entry); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -588,10 +588,7 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "user_id,username,start,end,description")
 
 	for _, e := range entries {
-		desc := ""
-		if e.Description != nil {
-			desc = *e.Description
-		}
+		desc := e.Description
 		fmt.Fprintf(w, "%d,%s,%s,%s,%s\n", user.ID, user.Name, e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
 	}
 }
