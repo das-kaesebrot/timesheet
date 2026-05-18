@@ -38,6 +38,13 @@ type TimesheetEntry struct {
 	Description string
 }
 
+type TimesheetEntryUpdate struct {
+	Name        string
+	Start       time.Time
+	End         time.Time
+	Description string
+}
+
 // Note: Gorm will fail if the function signature
 //	does not include `*gorm.DB` and `error`
 
