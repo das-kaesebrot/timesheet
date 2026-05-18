@@ -1,0 +1,37 @@
+{{ define "user_form" }}
+<div class="mb-3 input-group">
+    <span class="input-group-text">Name</span>
+    <input type="text" name="name" class="form-control" value="{{.User.Name}}">
+</div>
+<div class="mb-3 input-group">
+    <span class="input-group-text">Weekly Work Time</span>
+    <input type="text" name="weekly_work_time" class="form-control" value="{{or .User.WeeklyWorkTime "40h"}}">
+</div>
+<div class="mb-3 input-group">
+    <span class="input-group-text">Timesheet Granularity</span>
+    <input type="text" name="timesheet_granularity" class="form-control" value="{{or .User.TimesheetGranularity "15m"}}">
+</div>
+<div class="mb-3 input-group">
+    <span class="input-group-text">Default Timezone</span>
+    <select class="form-select" name="default_timezone" id="defaultTimezone">
+    {{range .Timezones}}
+        <option {{ if (eq . $.User.DefaultTimezone)}}selected {{end}}value="{{ . }}">{{ . }}</option>
+    {{end}}
+    </select>
+</div>
+<div class="mb-3 input-group">
+    <span class="input-group-text">Week start day</span>
+    <select class="form-select" name="week_start_day">
+    {{range .Weekdays}}
+        <option {{ if (eq . $.User.StartOfWeek)}}selected {{end}}value="{{ printf "%d" . }}">{{ . }}</option>
+    {{end}}
+    </select>
+</div>
+<script>document.getElementById('defaultTimezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone</script>
+<div class="mb-3 input-group">
+    <div class="form-check">
+        <input type="checkbox" name="active" class="form-check-input" id="active" {{if .User.Active}}checked{{end}}>
+        <label class="form-check-label" for="active">Active</label>
+    </div>
+</div>
+{{ end }}

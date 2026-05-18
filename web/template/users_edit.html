@@ -2,32 +2,7 @@
 {{define "main"}}
     <h1>Edit User: {{.User.ID}}</h1>
     <form method="POST" action="/users/{{.User.ID}}">
-        <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input type="text" name="name" class="form-control" value="{{.User.Name}}" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Weekly Work Time</label>
-            <input type="text" name="weekly_work_time" class="form-control" value="{{.User.WeeklyWorkTime}}">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Timesheet Granularity</label>
-            <input type="text" name="timesheet_granularity" class="form-control" value="{{.User.TimesheetGranularity}}">
-        </div>
-        <div class="mb-3 input-group">
-            <span class="input-group-text">Default Timezone</span>
-            <select class="form-select" name="default_timezone">
-            {{range .Timezones}}
-                <option {{ if (eq . $.User.DefaultTimezone)}}selected {{end}}value="{{ . }}">{{ . }}</option>
-            {{end}}
-            </select>
-        </div>
-        <div class="mb-3">
-            <div class="form-check">
-                <input type="checkbox" name="active" class="form-check-input" id="active" {{if .User.Active}}checked{{end}}>
-                <label class="form-check-label" for="active">Active</label>
-            </div>
-        </div>
+        {{ template "user_form" . }}
         <button type="submit" class="btn btn-primary">Update User</button>
         <a href="/users/{{.User.ID}}" class="btn btn-secondary">Cancel</a>
     </form>
