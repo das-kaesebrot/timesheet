@@ -35,6 +35,8 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 	mux.HandleFunc("/", h.Root)
 
+	mux.HandleFunc("GET /favicon.ico", h.GetFavicon)
+
 	mux.HandleFunc("GET /users", h.GetUsersList)
 	mux.HandleFunc("GET /users/new", h.GetUserNew)
 	mux.HandleFunc("POST /users", h.PostUserNew)
