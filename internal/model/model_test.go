@@ -2,6 +2,7 @@ package model
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -68,5 +69,41 @@ func TestTimesheetEntryBeforeCreateUniqueIDs(t *testing.T) {
 	entry2.BeforeCreate(&gorm.DB{})
 	if entry1.ID == entry2.ID {
 		t.Error("BeforeCreate generated duplicate UUIDs for TimesheetEntry")
+	}
+}
+
+var timesheetOverlapsTests = []struct {
+	inExisting *TimesheetEntry
+	inNew      *TimesheetEntry
+	out        bool
+}{
+	{
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 0, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 15, 0, 0, time.UTC)},
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 11, 0, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 11, 15, 0, 0, time.UTC)},
+		false,
+	},
+	{
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 0, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 15, 0, 0, time.UTC)},
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 5, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 20, 0, 0, time.UTC)},
+		true,
+	},
+	{
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 0, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 15, 0, 0, time.UTC)},
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 15, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 30, 0, 0, time.UTC)},
+		false,
+	},
+	{
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 10, 0, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 15, 0, 0, time.UTC)},
+		&TimesheetEntry{Start: time.Date(2026, 05, 11, 9, 15, 0, 0, time.UTC), End: time.Date(2026, 05, 11, 10, 5, 0, 0, time.UTC)},
+		true,
+	},
+}
+
+func TestTimesheetOverlaps(t *testing.T) {
+	for _, tt := range timesheetOverlapsTests {
+		result := tt.inNew.Overlaps(tt.inExisting)
+		if result != tt.out {
+			t.Errorf("result is not expected value! result=%v, expected=%v", result, tt.out)
+		}
 	}
 }

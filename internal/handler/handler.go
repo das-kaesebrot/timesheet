@@ -316,24 +316,30 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("start"), loc)
+	newEntryStart, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("start"), loc)
 	if err != nil {
 		http.Error(w, "Invalid start time: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	end, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("end"), loc)
+	newEntryEnd, err := time.ParseInLocation("2006-01-02T15:04", r.PostForm.Get("end"), loc)
 	if err != nil {
 		http.Error(w, "Invalid end time: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if end.Before(start) {
+	if newEntryEnd.Before(newEntryStart) {
 		http.Error(w, "End time must be after start time", http.StatusBadRequest)
 		return
 	}
 
-	duration := end.Sub(start)
+	duration := newEntryEnd.Sub(newEntryStart)
+
+	if duration == 0 {
+		http.Error(w, "Duration must be longer than 0", http.StatusBadRequest)
+		return
+	}
+
 	minutes := int(duration.Minutes())
 	granularityMinutes := int(user.TimesheetGranularity.Minutes())
 	if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
@@ -341,23 +347,23 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	desc := r.PostForm.Get("description")
+	newEntry := &model.TimesheetEntry{
+		UserID:      userID,
+		Start:       newEntryStart,
+		End:         newEntryEnd,
+		Description: desc,
+	}
+
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
-	for _, e := range existingEntries {
-		if !(end.Before(e.Start) || start.After(e.End)) {
+	for _, existingEntry := range existingEntries {
+		if newEntry.Overlaps(&existingEntry) {
 			http.Error(w, "Time entry overlaps with existing entry", http.StatusBadRequest)
 			return
 		}
 	}
 
-	desc := r.PostForm.Get("description")
-	entry := &model.TimesheetEntry{
-		UserID:      userID,
-		Start:       start,
-		End:         end,
-		Description: desc,
-	}
-
-	if err := h.repo.CreateTimesheetEntry(r.Context(), entry); err != nil {
+	if err := h.repo.CreateTimesheetEntry(r.Context(), newEntry); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

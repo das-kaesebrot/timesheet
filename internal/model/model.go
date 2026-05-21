@@ -86,3 +86,7 @@ func (timesheetEntry *TimesheetEntry) BeforeCreate(tx *gorm.DB) (err error) {
 	timesheetEntry.ID = newUuid
 	return
 }
+
+func (timesheetEntry *TimesheetEntry) Overlaps(other *TimesheetEntry) bool {
+	return timesheetEntry.Start.Before(other.End) && other.Start.Before(timesheetEntry.End)
+}
