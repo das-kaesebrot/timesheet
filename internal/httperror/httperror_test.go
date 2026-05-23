@@ -1,4 +1,4 @@
-package utility
+package httperror
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	err := New(http.StatusBadRequest, "bad request")
+	err := New(http.StatusBadRequest, "bad request", nil)
 	if err == nil {
 		t.Fatal("New returned nil")
 	}
@@ -30,7 +30,7 @@ func TestNewWithDifferentCodes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		err := New(tt.code, tt.message)
+		err := New(tt.code, tt.message, nil)
 		if err.Code != tt.code {
 			t.Errorf("expected code %d, got %d", tt.code, err.Code)
 		}
@@ -41,7 +41,7 @@ func TestNewWithDifferentCodes(t *testing.T) {
 }
 
 func TestNewEmptyMessage(t *testing.T) {
-	err := New(http.StatusOK, "")
+	err := New(http.StatusOK, "", nil)
 	if err == nil {
 		t.Fatal("New returned nil")
 	}
@@ -71,7 +71,7 @@ func TestNotFoundIsHTTPError(t *testing.T) {
 }
 
 func TestErrorImplementsErrorInterface(t *testing.T) {
-	err := New(http.StatusTeapot, "I'm a teapot")
+	err := New(http.StatusTeapot, "I'm a teapot", nil)
 	var e error = err
 	if e.Error() != "I'm a teapot" {
 		t.Errorf("expected 'I'm a teapot', got '%s'", e.Error())

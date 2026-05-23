@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/das-kaesebrot/timesheet/internal/handler"
+	"github.com/das-kaesebrot/timesheet/internal/middleware"
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
@@ -32,31 +33,39 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	var handlerMiddleware = []middleware.Middleware{
+		middleware.LoggerMiddleware,
+	}
+
+	eh := middleware.ErrorHandler(renderer)
+	with := func(fn func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
+		return middleware.Chain(eh(fn), handlerMiddleware...)
+	}
+
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
-	mux.HandleFunc("/", h.Root)
+	mux.HandleFunc("/", with(h.Root))
 
-	mux.HandleFunc("GET /favicon.ico", h.GetFavicon)
+	mux.HandleFunc("GET /favicon.ico", eh(h.GetFavicon))
 
-	mux.HandleFunc("GET /users", h.GetUsersList)
-	mux.HandleFunc("GET /users/new", h.GetUserNew)
-	mux.HandleFunc("POST /users", h.PostUserNew)
-	mux.HandleFunc("GET /users/{id}", h.GetUserOverview)
-	mux.HandleFunc("GET /users/{id}/edit", h.GetUserEdit)
-	mux.HandleFunc("POST /users/{id}", h.PostUserUpdate)
-	mux.HandleFunc("POST /users/{id}/delete", h.PostUserDelete)
+	mux.HandleFunc("GET /users", with(h.GetUsersList))
+	mux.HandleFunc("GET /users/new", with(h.GetUserNew))
+	mux.HandleFunc("POST /users", with(h.PostUserNew))
+	mux.HandleFunc("GET /users/{id}", with(h.GetUserOverview))
+	mux.HandleFunc("GET /users/{id}/edit", with(h.GetUserEdit))
+	mux.HandleFunc("POST /users/{id}", with(h.PostUserUpdate))
+	mux.HandleFunc("POST /users/{id}/delete", with(h.PostUserDelete))
 
-	mux.HandleFunc("GET /users/{id}/entries/new", h.GetEntryNew)
-	mux.HandleFunc("GET /users/{id}/entries/new/quick", h.GetEntryNewQuick)
-	mux.HandleFunc("POST /users/{id}/entries", h.PostEntryNew)
-	mux.HandleFunc("POST /users/{id}/entries/quick", h.PostEntryNewQuick)
+	mux.HandleFunc("GET /users/{id}/entries/new", with(h.GetEntryNew))
+	mux.HandleFunc("GET /users/{id}/entries/new/quick", with(h.GetEntryNewQuick))
+	mux.HandleFunc("POST /users/{id}/entries", with(h.PostEntryNew))
+	mux.HandleFunc("POST /users/{id}/entries/quick", with(h.PostEntryNewQuick))
 
-	mux.HandleFunc("GET /users/{id}/export", h.ExportUser)
-	//mux.HandleFunc("POST /users/{id}/import", h.PostEntryNew)
+	mux.HandleFunc("GET /users/{id}/export", with(h.ExportUser))
 
-	mux.HandleFunc("GET /entries/{id}/edit", h.GetEntryEdit)
-	mux.HandleFunc("POST /entries/{id}", h.PostEntryUpdate)
-	mux.HandleFunc("GET /entries/{id}/delete", h.PostEntryDelete)
-	mux.HandleFunc("DELETE /entries/{id}", h.PostEntryDelete)
+	mux.HandleFunc("GET /entries/{id}/edit", with(h.GetEntryEdit))
+	mux.HandleFunc("POST /entries/{id}", with(h.PostEntryUpdate))
+	mux.HandleFunc("GET /entries/{id}/delete", with(h.PostEntryDelete))
+	mux.HandleFunc("DELETE /entries/{id}", with(h.PostEntryDelete))
 
 	host := os.Getenv("TIMESHEET_HOST")
 	if host == "" {
