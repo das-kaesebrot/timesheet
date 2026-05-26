@@ -563,13 +563,18 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request, orde
 		return nil, err
 	}
 
+	slices.SortFunc(weekStarts, utility.CompareTimes) // ascending order
+
+	var orderDescending = true
+	if order == SortOrderAscending {
+		orderDescending = false
+	} else {
+		slices.Reverse(weekStarts)
+	}
+
 	summaries := make([]WeeklySummary, len(weekStarts))
 
 	for i, startDate := range weekStarts {
-		var orderDescending = true
-		if order == SortOrderAscending {
-			orderDescending = false
-		}
 		entriesInWeek, err := h.repo.GetTimesheetEntriesByUserIDInRangeInOrder(r.Context(), u.ID, startDate, startDate.AddDate(0, 0, 7), orderDescending)
 		if err != nil {
 			return nil, err
