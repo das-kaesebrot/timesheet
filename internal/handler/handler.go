@@ -328,6 +328,10 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) error {
 		return httperror.BadRequest("Duration must be longer than 0")
 	}
 
+	if int(duration.Seconds()) >= 24*60*60 {
+		return httperror.BadRequest("Duration can't be longer than 24 hours!")
+	}
+
 	minutes := int(duration.Minutes())
 	granularityMinutes := int(user.TimesheetGranularity.Minutes())
 	if granularityMinutes > 0 && minutes%granularityMinutes != 0 {
