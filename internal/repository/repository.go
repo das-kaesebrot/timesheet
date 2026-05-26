@@ -83,7 +83,7 @@ func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, use
 func (r *Repository) GetTimesheetEntriesByUserIDInRangeInOrder(ctx context.Context, userID uuid.UUID, startInclusive, endExclusive time.Time, orderDescending bool) ([]*model.TimesheetEntry, error) {
 	var entries []*model.TimesheetEntry
 	endExclusive = endExclusive.AddDate(0, 0, 1)
-	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, startInclusive, endExclusive).Order(clause.OrderByColumn{Column: clause.Column{Name: "start"}, Desc: orderDescending}).Find(&entries).Error
+	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND start < ?", userID, startInclusive, endExclusive).Order(clause.OrderByColumn{Column: clause.Column{Name: "start"}, Desc: orderDescending}).Find(&entries).Error
 	return entries, err
 }
 
