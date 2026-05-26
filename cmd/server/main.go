@@ -64,8 +64,7 @@ func main() {
 
 	mux.HandleFunc("GET /entries/{id}/edit", with(h.GetEntryEdit))
 	mux.HandleFunc("POST /entries/{id}", with(h.PostEntryUpdate))
-	mux.HandleFunc("GET /entries/{id}/delete", with(h.PostEntryDelete))
-	mux.HandleFunc("DELETE /entries/{id}", with(h.PostEntryDelete))
+	mux.HandleFunc("POST /users/{id}/entries/delete", with(h.PostEntryDelete))
 
 	host := os.Getenv("TIMESHEET_HOST")
 	if host == "" {

@@ -21,11 +21,15 @@
             </div>
             
             <div class="card-body p-0">
+                <form action="/users/{{$.User.ID}}/entries/delete" method="POST" class="batch-delete-form">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th class="ps-4 fw-semibold">Date</th>
+                                <th class="ps-4" style="width: 40px;">
+                                    <input type="checkbox" class="select-all form-check-input" aria-label="Select all entries in this week">
+                                </th>
+                                <th class="fw-semibold">Date</th>
                                 <th class="fw-semibold">Start</th>
                                 <th class="fw-semibold">End</th>
                                 <th class="fw-semibold">Duration</th>
@@ -37,6 +41,9 @@
                             {{range .Entries}}
                             <tr>
                                 <td class="ps-4">
+                                    <input type="checkbox" name="entry_ids" value="{{.ID}}" class="entry-checkbox form-check-input">
+                                </td>
+                                <td>
                                     <strong>{{.Start.Format "Mon, Jan 2"}}</strong>
                                 </td>
                                 <td class="text-muted">{{.Start.Format "15:04"}}</td>
@@ -54,7 +61,10 @@
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="/entries/{{.ID}}/edit" class="btn btn-outline-primary">Edit</a>
-                                        <a href="/entries/{{.ID}}/delete" class="btn btn-outline-danger">Delete</a>
+                                        <form action="/users/{{$.User.ID}}/entries/delete" method="POST" class="d-inline">
+                                            <input type="hidden" name="entry_ids" value="{{.ID}}">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -62,6 +72,10 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="d-flex align-items-center px-3 py-2 border-top">
+                    <button type="submit" class="btn btn-sm btn-outline-danger delete-selected-btn" disabled>Delete Selected</button>
+                </div>
+                </form>
             </div>
             
             <div class="card-footer">

@@ -60,6 +60,7 @@ timesheet/
 - [x] Edit entry form (`GET /entries/:id/edit`)
 - [x] Update entry (`POST /entries/:id/edit`)
 - [x] Delete entry (`POST /entries/:id/delete`)
+- [x] Batch delete entries with per-week checkboxes and select-all (`POST /users/:id/entries/batch-delete`)
 
 ### Phase 5: Timesheet Overview
 - [x] Overview page with weekly summary (`GET /users/:id/overview`)

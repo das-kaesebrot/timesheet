@@ -440,19 +440,30 @@ func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) error {
-	id, err := uuid.Parse(r.PathValue("id"))
+	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		return httperror.BadRequest("Invalid entry ID")
+		return httperror.BadRequest("Invalid user ID")
 	}
 
-	entry, err := h.repo.GetTimesheetEntryByID(r.Context(), id)
-	if err != nil {
-		return httperror.New(http.StatusNotFound, "Entry not found", err)
+	if err := r.ParseForm(); err != nil {
+		return httperror.New(http.StatusBadRequest, "Invalid form data", err)
 	}
 
-	userID := entry.UserID
+	entryIDs := r.PostForm["entry_ids"]
+	if len(entryIDs) == 0 {
+		return httperror.BadRequest("No entries selected")
+	}
 
-	if err := h.repo.DeleteTimesheetEntry(r.Context(), id); err != nil {
+	ids := make([]uuid.UUID, 0, len(entryIDs))
+	for _, idStr := range entryIDs {
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			return httperror.BadRequest("Invalid entry ID")
+		}
+		ids = append(ids, id)
+	}
+
+	if err := h.repo.DeleteTimesheetEntries(r.Context(), ids); err != nil {
 		return httperror.InternalServerError(err)
 	}
 
