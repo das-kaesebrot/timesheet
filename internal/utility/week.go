@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"cmp"
 	"errors"
 	"math"
 	"time"
@@ -125,4 +126,8 @@ func AsTimezone(toAdjust time.Time, loc *time.Location) time.Time {
 		return toAdjust
 	}
 	return time.Date(toAdjust.Year(), toAdjust.Month(), toAdjust.Day(), toAdjust.Hour(), toAdjust.Minute(), toAdjust.Second(), toAdjust.Nanosecond(), loc)
+}
+
+func CompareTimes(a, b time.Time) int {
+	return cmp.Compare(a.Unix(), b.Unix())
 }
