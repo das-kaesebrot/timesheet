@@ -86,6 +86,6 @@ func (r *Repository) UpdateTimesheetEntry(ctx context.Context, entry *model.Time
 	return r.db.WithContext(ctx).Save(entry).Error
 }
 
-func (r *Repository) DeleteTimesheetEntry(ctx context.Context, id uuid.UUID) error {
-	return r.db.WithContext(ctx).Delete(&model.TimesheetEntry{}, id).Error
+func (r *Repository) DeleteTimesheetEntries(ctx context.Context, ids []uuid.UUID) error {
+	return r.db.WithContext(ctx).Delete(&model.TimesheetEntry{}, ids).Error
 }

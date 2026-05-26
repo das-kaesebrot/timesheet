@@ -374,8 +374,8 @@ func TestDeleteTimesheetEntry(t *testing.T) {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
 	}
 
-	if err := repo.DeleteTimesheetEntry(context.Background(), entry.ID); err != nil {
-		t.Fatalf("DeleteTimesheetEntry failed: %v", err)
+	if err := repo.DeleteTimesheetEntries(context.Background(), []uuid.UUID{entry.ID}); err != nil {
+		t.Fatalf("DeleteTimesheetEntries failed: %v", err)
 	}
 
 	_, err := repo.GetTimesheetEntryByID(context.Background(), entry.ID)
