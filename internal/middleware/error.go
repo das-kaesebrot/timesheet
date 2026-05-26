@@ -20,7 +20,6 @@ func ErrorHandler(renderer *template.Renderer) func(func(w http.ResponseWriter, 
 
 				if errors.As(err, &httpErr) {
 					log.Printf("HTTP %d %s (cause: %v)", httpErr.Code, httpErr.Error(), httpErr.Unwrap())
-					w.WriteHeader(httpErr.Code)
 					code = httpErr.Code
 					message = httpErr.Error()
 				} else {
