@@ -1,6 +1,7 @@
 package model
 
 import (
+	"cmp"
 	"time"
 
 	"github.com/google/uuid"
@@ -89,4 +90,17 @@ func (timesheetEntry *TimesheetEntry) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (timesheetEntry *TimesheetEntry) Overlaps(other *TimesheetEntry) bool {
 	return timesheetEntry.Start.Before(other.End) && other.Start.Before(timesheetEntry.End)
+}
+
+func comparyByDate(a, b *TimesheetEntry) int {
+	return cmp.Compare(a.Start.Nanosecond(), b.Start.Nanosecond())
+	/*
+		if a == b {
+			return 0
+		}
+		if a.Start.Before(b.Start) {
+			return -1
+		}
+		return 1
+	*/
 }
