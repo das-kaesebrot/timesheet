@@ -7,6 +7,7 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Repository struct {
@@ -63,8 +64,8 @@ func (r *Repository) CountTimesheetEntriesByUserID(ctx context.Context, userID u
 	return count, err
 }
 
-func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) ([]model.TimesheetEntry, error) {
-	var entries []model.TimesheetEntry
+func (r *Repository) GetTimesheetEntriesByUserID(ctx context.Context, userID uuid.UUID) ([]*model.TimesheetEntry, error) {
+	var entries []*model.TimesheetEntry
 	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("start DESC").Find(&entries).Error
 	return entries, err
 }
@@ -75,10 +76,14 @@ func (r *Repository) GetEarliestTimesheetEntryByUserID(ctx context.Context, user
 	return entry, err
 }
 
-func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uuid.UUID, startInclusive, endExclusive time.Time) ([]model.TimesheetEntry, error) {
-	var entries []model.TimesheetEntry
+func (r *Repository) GetTimesheetEntriesByUserIDInRange(ctx context.Context, userID uuid.UUID, startInclusive, endExclusive time.Time) ([]*model.TimesheetEntry, error) {
+	return r.GetTimesheetEntriesByUserIDInRangeInOrder(ctx, userID, startInclusive, endExclusive, true)
+}
+
+func (r *Repository) GetTimesheetEntriesByUserIDInRangeInOrder(ctx context.Context, userID uuid.UUID, startInclusive, endExclusive time.Time, orderDescending bool) ([]*model.TimesheetEntry, error) {
+	var entries []*model.TimesheetEntry
 	endExclusive = endExclusive.AddDate(0, 0, 1)
-	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, startInclusive, endExclusive).Order("start DESC").Find(&entries).Error
+	err := r.db.WithContext(ctx).Where("user_id = ? AND start >= ? AND end < ?", userID, startInclusive, endExclusive).Order(clause.OrderByColumn{Column: clause.Column{Name: "start"}, Desc: orderDescending}).Find(&entries).Error
 	return entries, err
 }
 

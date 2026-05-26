@@ -23,6 +23,13 @@ type Handler struct {
 	renderer *template.Renderer
 }
 
+type SortOrder int
+
+const (
+	SortOrderDescending SortOrder = iota
+	SortOrderAscending
+)
+
 func New(repo *repository.Repository, renderer *template.Renderer) *Handler {
 	return &Handler{repo: repo, renderer: renderer}
 }
@@ -59,7 +66,7 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	summaries, err := h.GetWeeklySummariesForUser(user, r)
+	summaries, err := h.GetWeeklySummariesForUser(user, r, SortOrderDescending)
 	if err != nil {
 		return httperror.InternalServerError(err)
 	}
@@ -337,7 +344,7 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) error {
 
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
 	for _, existingEntry := range existingEntries {
-		if newEntry.Overlaps(&existingEntry) {
+		if newEntry.Overlaps(existingEntry) {
 			return httperror.BadRequest("Time entry overlaps with existing entry")
 		}
 	}
@@ -482,7 +489,7 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) error {
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	var entries []model.TimesheetEntry
+	var entries []*model.TimesheetEntry
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
 
@@ -523,10 +530,10 @@ type WeeklySummary struct {
 	EndOfWeek     time.Time
 	TimeLogged    time.Duration
 	WeeklyDiff    time.Duration
-	Entries       []model.TimesheetEntry
+	Entries       []*model.TimesheetEntry
 }
 
-func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]WeeklySummary, error) {
+func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request, order SortOrder) ([]WeeklySummary, error) {
 	entries, err := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID)
 	if err != nil {
 		return nil, err
@@ -555,7 +562,11 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request) ([]W
 	summaries := make([]WeeklySummary, len(weekStarts))
 
 	for i, startDate := range weekStarts {
-		entriesInWeek, err := h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), u.ID, startDate, startDate.AddDate(0, 0, 7))
+		var orderDescending = true
+		if order == SortOrderAscending {
+			orderDescending = false
+		}
+		entriesInWeek, err := h.repo.GetTimesheetEntriesByUserIDInRangeInOrder(r.Context(), u.ID, startDate, startDate.AddDate(0, 0, 7), orderDescending)
 		if err != nil {
 			return nil, err
 		}

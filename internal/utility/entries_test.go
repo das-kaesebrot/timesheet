@@ -17,7 +17,7 @@ func TestSumEntryDurationsEmpty(t *testing.T) {
 
 func TestSumEntryDurations(t *testing.T) {
 	start := time.Date(2026, 5, 11, 9, 0, 0, 0, time.UTC)
-	entries := []model.TimesheetEntry{
+	entries := []*model.TimesheetEntry{
 		{ID: uuid.UUID{}, Start: start, End: start.Add(8 * time.Hour)},
 		{ID: uuid.UUID{}, Start: start.Add(24 * time.Hour), End: start.Add(24*time.Hour + 4*time.Hour)},
 	}
@@ -31,7 +31,7 @@ func TestSumEntryDurations(t *testing.T) {
 
 func TestSumEntryDurationsZeroDuration(t *testing.T) {
 	now := time.Now()
-	entries := []model.TimesheetEntry{
+	entries := []*model.TimesheetEntry{
 		{ID: uuid.UUID{}, Start: now, End: now},
 	}
 
@@ -43,7 +43,7 @@ func TestSumEntryDurationsZeroDuration(t *testing.T) {
 
 func TestSumEntryDurationsNegativeDuration(t *testing.T) {
 	now := time.Now()
-	entries := []model.TimesheetEntry{
+	entries := []*model.TimesheetEntry{
 		{ID: uuid.UUID{}, Start: now.Add(1 * time.Hour), End: now},
 	}
 
@@ -55,7 +55,7 @@ func TestSumEntryDurationsNegativeDuration(t *testing.T) {
 
 func TestSumEntryDurationsMultipleEntries(t *testing.T) {
 	start := time.Date(2026, 5, 11, 0, 0, 0, 0, time.UTC)
-	entries := []model.TimesheetEntry{
+	entries := []*model.TimesheetEntry{
 		{ID: uuid.UUID{}, Start: start, End: start.Add(1 * time.Hour)},
 		{ID: uuid.UUID{}, Start: start.Add(2 * time.Hour), End: start.Add(3 * time.Hour)},
 		{ID: uuid.UUID{}, Start: start.Add(4 * time.Hour), End: start.Add(10 * time.Hour)},
