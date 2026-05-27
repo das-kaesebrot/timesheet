@@ -3,10 +3,26 @@
     const granularityMillis = {{.User.TimesheetGranularity.Milliseconds}};
     function setNow(targetName) {
         const now = Date.now();
-        const date = new Date(now - (now % granularityMillis));
-        document.getElementById(targetName).value = date
-            .toJSON()
-            .substring(0, 16);
+        const snapped = now - (now % granularityMillis);
+        const timeZone = document.getElementById("select-timezone").value;
+
+        // Format the current time directly in the target timezone
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+            timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        });
+
+        // Get parts and reconstruct as "YYYY-MM-DDTHH:MM"
+        const parts = Object.fromEntries(
+            formatter.formatToParts(snapped).map(({ type, value }) => [type, value])
+        );
+        const localString = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+        document.getElementById(targetName).value = localString;
     };
     function increment(targetName) {
         document.getElementById(targetName).stepUp();
@@ -53,14 +69,14 @@
 </div>
 <div class="mb-3 input-group">
     <span class="input-group-text">End</span>
-    <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
+    <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
     <button class="btn btn-outline-secondary" id="button-end-now" type="button">~Now</button>
     <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{.User.TimesheetGranularity}}</button>
     <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{.User.TimesheetGranularity}}</button>
 </div>
 <div class="mb-3 input-group">
     <span class="input-group-text">Timezone</span>
-    <select class="form-select" name="timezone">
+    <select class="form-select" id="select-timezone" name="timezone">
     {{range .Timezones}}
         <option {{ if (eq . $.User.DefaultTimezone)}}selected {{end}}value="{{ . }}">{{ . }}</option>
     {{end}}
