@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - "**.go"
+      - "**.html"
+      - go.mod
+      - go.sum
       - .github/workflows/build-and-publish.yml
       - Dockerfile
 env:
