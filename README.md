@@ -58,10 +58,10 @@ This application uses Open Source components. You can find the source code of th
 - Copyright (c) 2013-present [jinzhu](https://github.com/jinzhu) and contributors
 - [MIT License](https://github.com/go-gorm/gorm/blob/master/LICENSE)
 
-### [GORM SQLite Driver](https://github.com/go-gorm/sqlite)
+### [Pure-Go SQLite driver for GORM](https://github.com/glebarez/sqlite)
 
-- Copyright (c) 2013-present [jinzhu](https://github.com/jinzhu) and contributors
-- [MIT License](https://github.com/go-gorm/sqlite/blob/master/License)
+- Copyright (c) 2013-present [jinzhu](https://github.com/jinzhu), [glebarez](https://github.com/glebarez) and contributors
+- [MIT License](https://github.com/glebarez/sqlite/blob/master/License)
 
 ### [uuid](https://github.com/google/uuid)
 
