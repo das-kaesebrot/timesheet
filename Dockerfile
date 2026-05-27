@@ -9,11 +9,18 @@ RUN go mod download
 COPY . .
 RUN go build -v -o /usr/local/bin/app ./cmd/server
 
-FROM scratch
+FROM docker.io/library/alpine
 
-COPY --from=build /usr/local/bin/app /timesheet
-COPY contrib/passwd /etc/passwd
+ARG APP_WORKDIR="/var/opt/timesheet"
+ARG RUN_UID="10020"
+ARG RUN_USER="timesheet"
 
-USER timesheet
+RUN mkdir -pv ${APP_WORKDIR}
+RUN addgroup -g ${RUN_UID} ${RUN_USER} && \
+    adduser -h ${APP_WORKDIR} -u ${RUN_UID} -G ${RUN_USER} -s /bin/false -D ${RUN_USER}
+WORKDIR ${APP_WORKDIR}
 
-ENTRYPOINT [ "/timesheet"]
+COPY --from=build /usr/local/bin/app /usr/local/bin/timesheet
+USER ${RUN_USER}
+
+CMD ["timesheet"]
