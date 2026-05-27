@@ -11,6 +11,19 @@ timesheet is a web-based time tracking application that allows you to manage use
 - [x] CSV export
 - [ ] CSV import
 
+## Docker
+
+There's a container image ready to run:
+```
+ghcr.io/das-kaesebrot/timesheet
+```
+
+Example command to run it:
+```bash
+user@machine:~$ docker run --rm -it -p 8080:8080 ghcr.io/das-kaesebrot/timesheet
+2026/05/27 22:22:56 Starting server on host [::]:8080
+```
+
 ## Build and run
 
 Clone the repository and build the binary:
