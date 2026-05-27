@@ -55,7 +55,7 @@
                                     <strong>{{.Start.Format "Mon, Jan 2"}}</strong>
                                 </td>
                                 <td class="text-muted">{{.Start.Format "15:04"}}</td>
-                                <td class="text-muted">{{.End.Format "15:04"}}</td>
+                                <td class="text-muted">{{.End.Format "15:04"}} {{if (or (ne .End.Day .Start.Day) (ne .End.Month .Start.Month) (ne .End.Year .Start.Year))}}<span class="fst-italic">({{$days := daysLater .Start .End}}{{$days}} day{{if gt $days 1}}s{{end}} later)</span>{{end}}</td>
                                 <td>
                                     <span class="text-muted">{{.End.Sub .Start}}</span>
                                 </td>

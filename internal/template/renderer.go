@@ -3,6 +3,7 @@ package template
 import (
 	"fmt"
 	"html/template"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -42,6 +43,11 @@ func New(dir string) (*Renderer, error) {
 			},
 			"sub": func(a, b int) int {
 				return a - b
+			},
+			"daysLater": func(start, end time.Time) int {
+				zeroedStart := utility.ZeroTimeComponents(start)
+				diff := end.Sub(zeroedStart)
+				return int(math.Floor(diff.Hours() / 24.0))
 			},
 			"seq": func(start, end int) []int {
 				n := end - start + 1
