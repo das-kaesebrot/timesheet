@@ -384,7 +384,7 @@ func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) error 
 		return httperror.InternalServerError(err)
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/users/%s/entries", entry.UserID.String()), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", entry.UserID.String()), http.StatusFound)
 	return nil
 }
 
