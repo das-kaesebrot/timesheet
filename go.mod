@@ -5,7 +5,6 @@ go 1.26.2
 require gorm.io/gorm v1.31.1
 
 require (
-	github.com/client9/nowandlater v0.9.1-0.20260430045912-9cd542b760f9
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/glebarez/sqlite v1.11.0

@@ -53,11 +53,6 @@ This application uses Open Source components. You can find the source code of th
 - Copyright (c) 2009,2014 Google Inc
 - [BSD33-Clause License](https://github.com/google/uuid/blob/master/LICENSE)
 
-### [nowandlater](https://github.com/client9/nowandlater)
-
-- Copyright (c) 2026 [Nick Galbreath](https://github.com/client9)
-- [MIT License](https://github.com/client9/nowandlater/blob/master/LICENSE)
-
 ### [golang.org/x/crypto](https://pkg.go.dev/golang.org/x/crypto)
 
 - Copyright (c) 2009 The Go Authors

@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/client9/nowandlater"
 	"github.com/das-kaesebrot/timesheet/internal/httperror"
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
@@ -228,63 +227,6 @@ func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) error
 	}
 
 	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user})
-	return nil
-}
-
-func (h *Handler) PostEntryNewQuick(w http.ResponseWriter, r *http.Request) error {
-	userID, err := uuid.Parse(r.PathValue("id"))
-	if err != nil {
-		return httperror.BadRequest("Invalid user ID")
-	}
-
-	user, err := h.repo.GetUserByID(r.Context(), userID)
-	if err != nil {
-		return httperror.New(http.StatusNotFound, "User not found", err)
-	}
-
-	if err := r.ParseForm(); err != nil {
-		return httperror.New(http.StatusBadRequest, "Invalid form data", err)
-	}
-
-	loc, err := time.LoadLocation(user.DefaultTimezone)
-	if err != nil {
-		return httperror.New(http.StatusBadRequest, "Invalid timezone", err)
-	}
-
-	p := nowandlater.Parser{Location: loc}
-	start, err := p.Parse(r.PostForm.Get("natural_language_time_start"))
-	if err != nil {
-		return httperror.New(http.StatusBadRequest, "Invalid start time", err)
-	}
-	end, err := p.Parse(r.PostForm.Get("natural_language_time_end"))
-	if err != nil {
-		return httperror.New(http.StatusBadRequest, "Invalid end time", err)
-	}
-
-	if end.Before(start) {
-		return httperror.BadRequest("End time must be after start time")
-	}
-
-	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
-	for _, e := range existingEntries {
-		if !(end.Before(e.Start) || start.After(e.End)) {
-			return httperror.BadRequest("Time entry overlaps with existing entry")
-		}
-	}
-
-	desc := r.PostForm.Get("description")
-	entry := &model.TimesheetEntry{
-		UserID:      userID,
-		Start:       start,
-		End:         end,
-		Description: desc,
-	}
-
-	if err := h.repo.CreateTimesheetEntry(r.Context(), entry); err != nil {
-		return httperror.InternalServerError(err)
-	}
-
-	http.Redirect(w, r, fmt.Sprintf("/users/%s/entries", userID.String()), http.StatusFound)
 	return nil
 }
 
