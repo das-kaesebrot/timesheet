@@ -33,6 +33,8 @@ The application can be configured via environment variables.
 |----------|-------------|---------|-----------|
 | `TIMESHEET_HOST` | Host address to bind to | `[::]` | No |
 | `TIMESHEET_PORT` | Port to listen on | `8080` | No |
+| `TIMESHEET_DB_FILE` | Path to the SQLite database file | `timesheet.db` or in docker `/var/opt/timesheet/data/timesheet.db` | No |
+| `TIMESHEET_WEB_DIR` | Directory the static and template files are server from | `web` or in docker `/var/opt/timesheet/web` | No |
 
 ## Open Source License Attribution
 

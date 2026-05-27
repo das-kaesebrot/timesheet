@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/das-kaesebrot/timesheet/internal/handler"
 	"github.com/das-kaesebrot/timesheet/internal/middleware"
@@ -15,7 +16,14 @@ import (
 )
 
 func main() {
-	db, err := gorm.Open(sqlite.Open("timesheet.db"), &gorm.Config{})
+	dbFile := path.Clean(os.Getenv("TIMESHEET_DB_FILE"))
+	if dbFile == "." {
+		dbFile = "timesheet.db"
+	}
+
+	log.Printf("Reading SQLite database from '%s'", dbFile)
+
+	db, err := gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
 	if err != nil {
 		log.Panicf("failed to connect database: %v", err)
 	}
@@ -23,8 +31,14 @@ func main() {
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.TimesheetEntry{})
 
+	webDir := path.Clean(os.Getenv("TIMESHEET_WEB_DIR"))
+
+	if webDir == "." {
+		webDir = "web"
+	}
+
 	repo := repository.New(db)
-	renderer, err := template.New("web/template")
+	renderer, err := template.New(path.Join(webDir, "template"))
 	if err != nil {
 		log.Panicf("failed to load templates: %v", err)
 	}
@@ -42,7 +56,7 @@ func main() {
 		return middleware.Chain(eh(fn), handlerMiddleware...)
 	}
 
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(path.Join(webDir, "static")))))
 	mux.HandleFunc("/", with(h.Root))
 
 	mux.HandleFunc("GET /favicon.ico", eh(h.GetFavicon))
@@ -76,5 +90,6 @@ func main() {
 	}
 
 	log.Printf("Starting server on host %s:%s", host, port)
+	log.Printf("Using '%s' as web dir", webDir)
 	log.Fatal(http.ListenAndServe(host+":"+port, mux))
 }
