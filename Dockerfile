@@ -20,7 +20,7 @@ RUN addgroup -g ${RUN_UID} ${RUN_USER} && \
     adduser -h ${APP_WORKDIR} -u ${RUN_UID} -G ${RUN_USER} -s /bin/false -D ${RUN_USER}
 WORKDIR ${APP_WORKDIR}
 
-COPY --from=build /usr/local/bin/app /user/local/bin/timesheet
+COPY --from=build /usr/local/bin/app /usr/local/bin/timesheet
 USER ${RUN_USER}
 
 CMD ["timesheet"]
