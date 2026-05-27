@@ -1,5 +1,6 @@
 {{define "entries_list"}}
 <div class="container-fluid px-0">
+    {{if gt (len .Summaries) 0}}
     {{range .Summaries}}
     <div class="week-summary mb-4">
         <div class="card shadow-sm">
@@ -8,6 +9,7 @@
                     <h5 class="mb-1 fw-bold">Week {{.WeekNumberISO}}</h5>
                     <small>{{.StartOfWeek.Format "Jan 2"}} - {{.EndOfWeek.Format "Jan 2, 2006"}}</small>
                 </div>
+                {{if gt (len .Entries) 0}}
                 <div class="text-end">
                     <div class="fs-4 fw-bold">{{.TimeLogged}}</div>
                     {{if gt .WeeklyDiff 0}}
@@ -18,8 +20,14 @@
                         <span class="badge bg-secondary">On target</span>
                     {{end}}
                 </div>
+                {{else}}
+                <div class="text-end">
+                    <span class="text-muted fst-italic">No entries</span>
+                </div>
+                {{end}}
             </div>
             
+            {{if gt (len .Entries) 0}}
             <div class="card-body p-0">
                 <form action="/users/{{$.User.ID}}/entries/delete" method="POST" class="batch-delete-form">
                 <div class="table-responsive">
@@ -95,7 +103,13 @@
                     </div>
                 </div>
             </div>
+            {{end}}
         </div>
+    </div>
+    {{end}}
+    {{else}}
+    <div class="text-start">
+        <span class="text-muted fst-italic">No entries yet</span>
     </div>
     {{end}}
 
