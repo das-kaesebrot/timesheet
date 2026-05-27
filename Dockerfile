@@ -15,13 +15,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -v -o /usr/local/bin/app ./cmd/server/main.go
+RUN go build -v -o /usr/local/bin/app ./cmd/server
 
 FROM scratch
 
-COPY --from=build /usr/local/bin/app /usr/local/bin/timesheet
+COPY --from=build /usr/local/bin/app /timesheet
 COPY contrib/passwd /etc/passwd
 
 USER timesheet
 
-CMD ["timesheet"]
+CMD ["/timesheet"]
