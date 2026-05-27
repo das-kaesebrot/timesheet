@@ -2,14 +2,6 @@ FROM docker.io/library/golang:alpine@sha256:91eda9776261207ea25fd06b5b7fed8d397d
 
 WORKDIR /usr/src/app
 
-ENV CGO_ENABLED=1
-
-# Add gcc and musl-dev
-# https://wiki.alpinelinux.org/wiki/GCC
-RUN apk add --no-cache \
-    gcc \
-    musl-dev
-
 # pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
 COPY go.mod go.sum ./
 RUN go mod download

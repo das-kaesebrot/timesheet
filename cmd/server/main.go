@@ -10,7 +10,7 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/model"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
 	"github.com/das-kaesebrot/timesheet/internal/template"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
