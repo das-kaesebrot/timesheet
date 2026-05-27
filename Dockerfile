@@ -24,4 +24,4 @@ COPY contrib/passwd /etc/passwd
 
 USER timesheet
 
-CMD ["/timesheet"]
+ENTRYPOINT [ "/timesheet"]
