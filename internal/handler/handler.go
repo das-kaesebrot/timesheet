@@ -425,8 +425,7 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) error {
 		return httperror.BadRequest("Invalid user ID")
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), id)
-	if err != nil {
+	if _, err = h.repo.GetUserByID(r.Context(), id); err != nil {
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
@@ -455,12 +454,15 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	w.Header().Set("Content-Type", "text/csv")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=timesheet_%d.csv", id))
-	fmt.Fprintln(w, "user_id,username,start,end,description")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=timesheet_%s_%d.csv", id, time.Now().Unix()))
+	fmt.Fprintln(w, "start,end,description")
 
 	for _, e := range entries {
 		desc := e.Description
-		fmt.Fprintf(w, "%d,%s,%s,%s,%s\n", user.ID, user.Name, e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
+		if desc == "" {
+			desc = "No description"
+		}
+		fmt.Fprintf(w, "%s,%s,%s\n", e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
 	}
 	return nil
 }
