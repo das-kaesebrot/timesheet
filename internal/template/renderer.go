@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/das-kaesebrot/timesheet/internal/utility"
@@ -60,6 +61,7 @@ func New(dir string) (*Renderer, error) {
 				}
 				return s
 			},
+			"join": strings.Join,
 		},
 		weekdays: utility.GetWeekdays(),
 	}

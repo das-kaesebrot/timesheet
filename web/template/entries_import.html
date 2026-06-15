@@ -1,0 +1,9 @@
+{{define "title"}}Import Entries to user{{end}}
+{{define "main"}}
+    <h1>Import Entries</h1>
+    <form method="POST" action="/users/{{.User.ID}}/entries/import" enctype="multipart/form-data">
+        {{ template "entries_import_form" . }}
+        <button type="submit" class="btn btn-primary">Import</button>
+        <a href="/users" class="btn btn-secondary">Cancel</a>
+    </form>
+{{end}}
