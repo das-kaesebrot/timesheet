@@ -463,13 +463,13 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 
 	// 10 MiB file upload limit
 	if err := r.ParseMultipartForm(maxFileSize); err != nil {
-		return httperror.BadRequest("Can't parse form!")
+		return httperror.BadRequest(fmt.Sprintf("Can't parse form! %v", err))
 	}
 
 	//fileType := r.PostFormValue("type")
 	file, fileHeader, err := r.FormFile("csv_file")
 	if err != nil {
-		return httperror.BadRequest("Invalid file!")
+		return httperror.BadRequest(fmt.Sprintf("Invalid file! %v", err))
 	}
 	defer file.Close()
 	fileSize := fileHeader.Size
