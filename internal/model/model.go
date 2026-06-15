@@ -2,6 +2,7 @@ package model
 
 import (
 	"cmp"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -86,6 +87,10 @@ func (timesheetEntry *TimesheetEntry) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	timesheetEntry.ID = newUuid
 	return
+}
+
+func (t *TimesheetEntry) String() string {
+	return fmt.Sprintf("TimesheetEntry{ID=%s, Start=%s, End=%s, UserID=%s, Description=%s, CreatedAt=%s, UpdatedAt=%s, DeletedAt=%s}", t.ID.String(), t.Start.Format(time.RFC3339), t.End.Format(time.RFC3339), t.UserID.String(), t.Description, t.CreatedAt.Format(time.RFC3339), t.UpdatedAt.Format(time.RFC3339), t.DeletedAt.Time.Format(time.RFC3339))
 }
 
 func (timesheetEntry *TimesheetEntry) Overlaps(other *TimesheetEntry) bool {
