@@ -435,6 +435,21 @@ func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
+func (h *Handler) GetImportEntries(w http.ResponseWriter, r *http.Request) error {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		return httperror.BadRequest("Invalid user ID")
+	}
+
+	user, err := h.repo.GetUserByID(r.Context(), id)
+	if err != nil {
+		return httperror.New(http.StatusNotFound, "User not found", err)
+	}
+
+	h.renderer.Render(w, "entries_import", map[string]interface{}{"User": user, "CSVMimeTypes": validCsvMimeTypes})
+	return nil
+}
+
 func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) error {
 	userID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
