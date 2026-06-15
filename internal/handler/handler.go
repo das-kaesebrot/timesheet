@@ -467,7 +467,7 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 	}
 
 	//fileType := r.PostFormValue("type")
-	file, fileHeader, err := r.FormFile("uploadFile")
+	file, fileHeader, err := r.FormFile("csv_file")
 	if err != nil {
 		return httperror.BadRequest("Invalid file!")
 	}
