@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"slices"
@@ -27,6 +30,19 @@ const (
 	SortOrderDescending SortOrder = iota
 	SortOrderAscending
 )
+
+const maxFileSize = 10 * 1024 * 1024
+
+var validCsvMimeTypes = []string{
+	"text/plain",
+	"application/vnd.ms-excel",
+	"text/x-csv",
+	"application/csv",
+	"application/x-csv",
+	"text/csv",
+	"text/comma-separated-values",
+	"text/x-comma-separated-values",
+}
 
 func New(repo *repository.Repository, renderer *template.Renderer) *Handler {
 	return &Handler{repo: repo, renderer: renderer}
@@ -416,6 +432,85 @@ func (h *Handler) PostEntryDelete(w http.ResponseWriter, r *http.Request) error 
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("/users/%s", userID.String()), http.StatusFound)
+	return nil
+}
+
+func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) error {
+	userID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		return httperror.BadRequest("Invalid user ID")
+	}
+	user, err := h.repo.GetUserByID(r.Context(), userID)
+	if err != nil {
+		return httperror.New(http.StatusNotFound, "User not found", err)
+	}
+
+	// 10 MiB file upload limit
+	if err := r.ParseMultipartForm(maxFileSize); err != nil {
+		return httperror.BadRequest("Can't parse form!")
+	}
+
+	//fileType := r.PostFormValue("type")
+	file, fileHeader, err := r.FormFile("uploadFile")
+	if err != nil {
+		return httperror.BadRequest("Invalid file!")
+	}
+	defer file.Close()
+	fileSize := fileHeader.Size
+
+	if fileSize > maxFileSize {
+		return httperror.BadRequest("Uploaded file can't be bigger than 10 MiB!")
+	}
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return httperror.BadRequest("Invalid file!")
+	}
+
+	detectedFileType := http.DetectContentType(fileBytes)
+	isValid := false
+	for _, mimeType := range validCsvMimeTypes {
+		if mimeType == detectedFileType {
+			isValid = true
+			break
+		}
+	}
+
+	if !isValid {
+		return httperror.BadRequest(fmt.Sprintf("Invalid file type: %s", detectedFileType))
+	}
+
+	csvReader := csv.NewReader(bytes.NewReader(fileBytes))
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		return httperror.BadRequest(fmt.Sprintf("Error reading CSV: %v", err))
+	}
+
+	for _, record := range records {
+		if len(record) != 3 {
+			return httperror.BadRequest(fmt.Sprintf("CSV record has wrong length! %s", record))
+		}
+
+		start, err := time.Parse(time.RFC3339, record[0])
+		if err != nil {
+			return httperror.BadRequest(fmt.Sprintf("Error parsing start time: '%s': %v", record[0], err))
+		}
+		end, err := time.Parse(time.RFC3339, record[1])
+		if err != nil {
+			return httperror.BadRequest(fmt.Sprintf("Error parsing end time: '%s': %v", record[1], err))
+		}
+
+		newEntry := &model.TimesheetEntry{
+			UserID:      userID,
+			Start:       start,
+			End:         end,
+			Description: record[2],
+		}
+		if err := h.repo.CreateTimesheetEntry(r.Context(), newEntry); err != nil {
+			return httperror.InternalServerError(err)
+		}
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", user.ID.String()), http.StatusFound)
 	return nil
 }
 
