@@ -69,8 +69,8 @@ func main() {
 	mux.HandleFunc("POST /users/{id}", with(h.PostUserUpdate))
 	mux.HandleFunc("POST /users/{id}/delete", with(h.PostUserDelete))
 
-	mux.HandleFunc("GET /users/{id}/entries/new", with(h.GetEntryNew))
-	mux.HandleFunc("GET /users/{id}/entries/new/quick", with(h.GetEntryNewQuick))
+	mux.HandleFunc("GET /users/{id}/entries", with(h.GetEntryNew))
+	mux.HandleFunc("GET /users/{id}/entries/quick", with(h.GetEntryNewQuick))
 	mux.HandleFunc("POST /users/{id}/entries", with(h.PostEntryNew))
 
 	mux.HandleFunc("GET /users/{id}/export", with(h.ExportUser))
