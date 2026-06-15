@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -568,14 +567,4 @@ func parseUserForm(form url.Values) (*model.UserUpdate, error) {
 	userUpdate.Active = form.Get("active") == "on"
 
 	return userUpdate, nil
-}
-
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-func (h *Handler) JSONError(w http.ResponseWriter, code int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
 }
