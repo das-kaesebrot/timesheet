@@ -501,7 +501,15 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 		return httperror.BadRequest(fmt.Sprintf("Error reading CSV: %v", err))
 	}
 
-	for _, record := range records {
+	// just the header or nothing --> ignore the file
+	if len(records) <= 1 {
+		http.Redirect(w, r, fmt.Sprintf("/users/%s", user.ID.String()), http.StatusFound)
+		return nil
+	}
+
+	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
+
+	for index, record := range records[1:] {
 		if len(record) != 3 {
 			return httperror.BadRequest(fmt.Sprintf("CSV record has wrong length! %s", record))
 		}
@@ -521,6 +529,13 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 			End:         end,
 			Description: record[2],
 		}
+
+		for _, existingEntry := range existingEntries {
+			if newEntry.Overlaps(existingEntry) {
+				return httperror.BadRequest(fmt.Sprintf("Time entry in row %d of CSV file overlaps with existing entry.\nNew entry: %v\nExisting entry: %v", index+2, newEntry, existingEntry))
+			}
+		}
+
 		if err := h.repo.CreateTimesheetEntry(r.Context(), newEntry); err != nil {
 			return httperror.InternalServerError(err)
 		}
