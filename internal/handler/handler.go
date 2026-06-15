@@ -35,6 +35,7 @@ const maxFileSize = 10 * 1024 * 1024
 
 var validCsvMimeTypes = []string{
 	"text/plain",
+	"text/plain; charset=utf-8",
 	"application/vnd.ms-excel",
 	"text/x-csv",
 	"application/csv",
