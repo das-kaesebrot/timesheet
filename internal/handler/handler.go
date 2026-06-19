@@ -126,9 +126,30 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 
 	pageSummaries := summaries[start:end]
 
+	useCurrentWeek := false
+
+	totalTimeLogged, err := h.getTotalTimeLoggedForUser(user, r, useCurrentWeek)
+	if err != nil {
+		return err
+	}
+
+	amountWeeksLogged, err := h.getTotalWeekNumLoggedForUser(user, r, useCurrentWeek)
+	if err != nil {
+		return err
+	}
+	totalDiff := totalTimeLogged - (user.WeeklyWorkTime * time.Duration(amountWeeksLogged))
+
+	// get total time logged again, to always show the actual entire time logged
+	totalTimeLogged, err = h.getTotalTimeLoggedForUser(user, r, true)
+	if err != nil {
+		return err
+	}
+
 	h.renderer.Render(w, "users_show", map[string]interface{}{
 		"User":               user,
 		"Summaries":          pageSummaries,
+		"TotalTimeLogged":    totalTimeLogged,
+		"TotalDiff":          totalDiff,
 		"Page":               page,
 		"PerPage":            perPage,
 		"AvailablePageSizes": availablePageSizes,
@@ -651,6 +672,65 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request, orde
 	}
 
 	return summaries, nil
+}
+
+func (h *Handler) getTotalTimeLoggedForUser(u *model.User, r *http.Request, includeCurrentWeek bool) (time.Duration, error) {
+	totalTimeLogged := time.Duration(0)
+
+	if amount, _ := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID); amount == 0 {
+		return 0, nil
+	}
+
+	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	firstWeekStartDate := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
+	var lastWeekStartDate time.Time
+
+	if includeCurrentWeek {
+		lastWeekStartDate = utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+	} else {
+		lastWeekStartDate = utility.GetPreviousWeekStartDate(time.Now(), u.StartOfWeek)
+	}
+
+	allEntries, err := h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), u.ID, firstWeekStartDate, lastWeekStartDate)
+
+	if err != nil {
+		return totalTimeLogged, err
+	}
+
+	for _, entry := range allEntries {
+		totalTimeLogged += entry.End.Sub(entry.Start)
+	}
+
+	return totalTimeLogged, nil
+}
+
+func (h *Handler) getTotalWeekNumLoggedForUser(u *model.User, r *http.Request, includeCurrentWeek bool) (int, error) {
+	if amount, _ := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID); amount == 0 {
+		return 0, nil
+	}
+
+	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	firstWeekStartDate := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
+	var lastWeekStartDate time.Time
+
+	if includeCurrentWeek {
+		lastWeekStartDate = utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+	} else {
+		lastWeekStartDate = utility.GetPreviousWeekStartDate(time.Now(), u.StartOfWeek)
+	}
+
+	timeRangeLogged := lastWeekStartDate.Sub(firstWeekStartDate)
+	weeksLogged := timeRangeLogged.Hours() / (168.0)
+
+	return int(weeksLogged), nil
 }
 
 func parseUserForm(form url.Values) (*model.UserUpdate, error) {

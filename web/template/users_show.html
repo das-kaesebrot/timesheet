@@ -40,6 +40,16 @@
                 <dd class="col-sm-4"><code>{{.User.ID}}</code></dd>
             </dl>
         </div>
+        <div class="card-body">
+            <span class="text-muted">Logged: <b>{{ .TotalTimeLogged }}</b></span>
+            {{if gt .TotalDiff 0}}
+                <span class="badge rounded-pill bg-success ms-2">+{{.TotalDiff}} (overtime)</span>
+            {{else if lt .TotalDiff 0}}
+                <span class="badge rounded-pill bg-danger ms-2">{{.TotalDiff}} (undertime)</span>
+            {{else}}
+                <span class="badge rounded-pill bg-secondary ms-2">±0 (on track)</span>
+            {{end}}
+        </div>
     </div>
 
     <div class="card shadow-sm">
