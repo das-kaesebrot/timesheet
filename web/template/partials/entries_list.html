@@ -41,6 +41,7 @@
                                 <th class="fw-semibold">Start</th>
                                 <th class="fw-semibold">End</th>
                                 <th class="fw-semibold">Duration</th>
+                                <th class="fw-semibold">PTO?</th>
                                 <th class="fw-semibold">Description</th>
                                 <th class="text-end pe-4 fw-semibold">Actions</th>
                             </tr>
@@ -58,6 +59,13 @@
                                 <td class="text-muted">{{.End.Format "15:04"}} {{if (or (ne .End.Day .Start.Day) (ne .End.Month .Start.Month) (ne .End.Year .Start.Year))}}<span class="fst-italic">({{$days := daysLater .Start .End}}{{$days}} day{{if gt $days 1}}s{{end}} later)</span>{{end}}</td>
                                 <td>
                                     <span class="text-muted">{{.End.Sub .Start}}</span>
+                                </td>
+                                <td>
+                                    {{if .IsPaidTimeOff}}
+                                        <span class="badge text-bg-warning">PTO</span>
+                                    {{else}}
+                                        <span class="text-muted fst-italic">No</span>
+                                    {{end}}
                                 </td>
                                 <td>
                                     {{if .Description}}

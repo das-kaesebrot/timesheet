@@ -33,11 +33,12 @@ type UserUpdate struct {
 
 type TimesheetEntry struct {
 	gorm.Model
-	ID          uuid.UUID
-	Start       time.Time
-	End         time.Time
-	UserID      uuid.UUID
-	Description string
+	ID            uuid.UUID
+	Start         time.Time
+	End           time.Time
+	UserID        uuid.UUID
+	Description   string
+	IsPaidTimeOff bool // to be set when the entry is for vacation time, sick leave, national holidays, etc. --> no actual worked time, just for correction purposes
 }
 
 type TimesheetEntryUpdate struct {

@@ -313,12 +313,15 @@ func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) error {
 		return httperror.New(http.StatusBadRequest, fmt.Sprintf("Duration must be divisible by %v", user.TimesheetGranularity), nil)
 	}
 
+	isPaidTimeOff := r.PostForm.Get("is_paidtimeoff") == "on"
+
 	desc := r.PostForm.Get("description")
 	newEntry := &model.TimesheetEntry{
-		UserID:      userID,
-		Start:       newEntryStart,
-		End:         newEntryEnd,
-		Description: desc,
+		UserID:        userID,
+		Start:         newEntryStart,
+		End:           newEntryEnd,
+		Description:   desc,
+		IsPaidTimeOff: isPaidTimeOff,
 	}
 
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
@@ -416,6 +419,7 @@ func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) error 
 	entry.End = end
 	desc := r.PostForm.Get("description")
 	entry.Description = desc
+	entry.IsPaidTimeOff = r.PostForm.Get("is_paidtimeoff") == "on"
 
 	if err := h.repo.UpdateTimesheetEntry(r.Context(), entry); err != nil {
 		return httperror.InternalServerError(err)
@@ -543,12 +547,17 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 		if err != nil {
 			return httperror.BadRequest(fmt.Sprintf("Error parsing end time: '%s': %v", record[1], err))
 		}
+		isPaidTimeOff, err := strconv.ParseBool(record[2])
+		if err != nil {
+			return httperror.BadRequest(fmt.Sprintf("Error parsing paid time off flag: '%s': %v", record[2], err))
+		}
 
 		newEntry := &model.TimesheetEntry{
-			UserID:      userID,
-			Start:       start,
-			End:         end,
-			Description: record[2],
+			UserID:        userID,
+			Start:         start,
+			End:           end,
+			IsPaidTimeOff: isPaidTimeOff,
+			Description:   record[3],
 		}
 
 		for _, existingEntry := range existingEntries {
@@ -602,14 +611,14 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) error {
 
 	w.Header().Set("Content-Type", "text/csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=timesheet_%s_%d.csv", id, time.Now().Unix()))
-	fmt.Fprintln(w, "start,end,description")
+	fmt.Fprintln(w, "start,end,is_paidtimeoff,description")
 
 	for _, e := range entries {
 		desc := e.Description
 		if desc == "" {
 			desc = "No description"
 		}
-		fmt.Fprintf(w, "%s,%s,%s\n", e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), desc)
+		fmt.Fprintf(w, "%s,%s,%s,%s\n", e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), strconv.FormatBool(e.IsPaidTimeOff), desc)
 	}
 	return nil
 }
