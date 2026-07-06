@@ -3,6 +3,7 @@ package template
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -71,6 +72,8 @@ func New(dir string) (*Renderer, error) {
 		return nil, err
 	}
 	r.timezones = availableTimezones
+
+	log.Printf("Found OS timezones: %v", availableTimezones)
 
 	return r, nil
 }

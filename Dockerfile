@@ -20,6 +20,7 @@ ENV TIMESHEET_WEB_DIR="${TIMESHEET_WEB_DIR}"
 ARG TIMESHEET_DATA_DIR="${APP_WORKDIR}/data"
 ENV TIMESHEET_DB_FILE="${TIMESHEET_DATA_DIR}/timesheet.db"
 
+RUN apk add --no-cache tzdata
 RUN mkdir -pv "${APP_WORKDIR}/data"
 RUN addgroup -g ${RUN_UID} ${RUN_USER} && \
     adduser -h ${APP_WORKDIR} -u ${RUN_UID} -G ${RUN_USER} -s /bin/false -D ${RUN_USER} && \
