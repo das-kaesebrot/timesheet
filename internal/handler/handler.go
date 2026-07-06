@@ -535,7 +535,7 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
 
 	for index, record := range records[1:] {
-		if len(record) != 3 {
+		if len(record) != 4 {
 			return httperror.BadRequest(fmt.Sprintf("CSV record has wrong length! %s", record))
 		}
 
