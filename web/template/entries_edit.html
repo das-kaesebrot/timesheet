@@ -7,7 +7,10 @@
     <form method="POST" action="/entries/{{.Entry.ID}}">
         {{ template "entry_form" . }}
         <button type="submit" class="btn btn-primary">Update Entry</button>
-        <a href="/entries/{{.Entry.ID}}/delete" class="btn btn-danger">Delete</a>
+        <button type="submit" class="btn btn-danger" form="delete-{{.Entry.ID}}">Delete</button>
         <a href="/users/{{.User.ID}}" class="btn btn-secondary">Cancel</a>
+    </form>
+    <form id="delete-{{.Entry.ID}}" action="/users/{{.User.ID}}/entries/delete" method="POST" class="d-inline">
+        <input type="hidden" name="entry_ids" value="{{.Entry.ID}}">
     </form>
 {{end}}
