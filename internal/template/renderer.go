@@ -21,9 +21,10 @@ type Renderer struct {
 	templates map[string]string
 	weekdays  []time.Weekday
 	timezones []string
+	version   string
 }
 
-func New(dir string) (*Renderer, error) {
+func New(dir string, version string) (*Renderer, error) {
 	r := &Renderer{
 		dir: dir,
 		funcs: template.FuncMap{
@@ -75,6 +76,8 @@ func New(dir string) (*Renderer, error) {
 
 	log.Printf("Found OS timezones: %v", availableTimezones)
 
+	r.version = version
+
 	return r, nil
 }
 
@@ -85,11 +88,7 @@ func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) 
 	}
 
 	if dataMap, ok := data.(map[string]interface{}); ok {
-		version := os.Getenv("VERSION")
-		if version == "" {
-			version = "dev"
-		}
-		dataMap["Version"] = version
+		dataMap["Version"] = r.version
 		dataMap["Timezones"] = r.timezones
 		dataMap["Weekdays"] = r.weekdays
 	}

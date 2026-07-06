@@ -78,7 +78,7 @@ func main() {
 	}
 
 	repo := repository.New(db)
-	renderer, err := template.New(path.Join(webDir, "template"))
+	renderer, err := template.New(path.Join(webDir, "template"), Version)
 	if err != nil {
 		log.Panicf("failed to load templates: %v", err)
 	}
