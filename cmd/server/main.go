@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +17,8 @@ import (
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
+
+var Version = "dev"
 
 // returns nil if file exists and is read/writable, otherwise returns the underlying err
 func checkFileAccess(path string) error {
@@ -33,6 +37,18 @@ func checkFileAccess(path string) error {
 }
 
 func main() {
+	versionFlag := false
+	flag.BoolVar(&versionFlag, "v", false, "print version information")
+	flag.BoolVar(&versionFlag, "version", false, "print version information")
+	flag.Parse()
+
+	if versionFlag {
+		fmt.Printf("%v\n", Version)
+		return
+	}
+
+	log.Printf("Version: %v", Version)
+
 	dbFile := path.Clean(os.Getenv("TIMESHEET_DB_FILE"))
 	if dbFile == "." {
 		dbFile = "timesheet.db"
