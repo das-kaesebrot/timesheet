@@ -63,6 +63,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          refSlug=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_REF_SLUG=$refSlug" >> $GITHUB_ENV
+
+      - name: Confirm git commit SHA output
+        run: echo ${{ env.COMMIT_REF_SLUG }}
+      
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -86,8 +95,10 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels:
+            ${{ steps.meta.outputs.labels }}
+            ${{ env.COMMIT_REF_SLUG }}
           build-args: |
-            APP_VERSION=${{ env.COMMIT_SHORT_SHA }}
+            VERSION=${{ env.COMMIT_REF_SLUG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
