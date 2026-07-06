@@ -237,6 +237,21 @@ func (h *Handler) PostUserDelete(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func (h *Handler) PostUserEntriesDelete(w http.ResponseWriter, r *http.Request) error {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		return httperror.BadRequest("Invalid user ID")
+	}
+
+	entryIDs := h.repo.GetTimesheetEntryIDsByUserID(r.Context(), id)
+	if err := h.repo.DeleteTimesheetEntries(r.Context(), entryIDs); err != nil {
+		return httperror.InternalServerError(err)
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/users/%s", id.String()), http.StatusFound)
+	return nil
+}
+
 func (h *Handler) GetEntryNew(w http.ResponseWriter, r *http.Request) error {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
@@ -615,9 +630,6 @@ func (h *Handler) ExportUser(w http.ResponseWriter, r *http.Request) error {
 
 	for _, e := range entries {
 		desc := e.Description
-		if desc == "" {
-			desc = "No description"
-		}
 		fmt.Fprintf(w, "%s,%s,%s,%s\n", e.Start.Format(time.RFC3339), e.End.Format(time.RFC3339), strconv.FormatBool(e.IsPaidTimeOff), desc)
 	}
 	return nil
