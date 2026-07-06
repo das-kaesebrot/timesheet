@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,22 @@ import (
 	"gorm.io/gorm"
 )
 
+// returns nil if file exists and is read/writable, otherwise returns the underlying err
+func checkFileAccess(path string) error {
+	// doesnt't exist -> not read/writeable
+	if _, err := os.Stat(path); err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(path, os.O_RDWR, 0)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return nil
+}
+
 func main() {
 	dbFile := path.Clean(os.Getenv("TIMESHEET_DB_FILE"))
 	if dbFile == "." {
@@ -22,6 +39,13 @@ func main() {
 	}
 
 	log.Printf("Reading SQLite database from '%s'", dbFile)
+	err := checkFileAccess(dbFile)
+
+	if errors.Is(err, os.ErrNotExist) {
+		log.Printf("database file doesn't exist yet, creating it")
+	} else if err != nil {
+		log.Panicf("failed reading database file: %v", err)
+	}
 
 	db, err := gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
 	if err != nil {
