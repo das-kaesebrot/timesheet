@@ -7,7 +7,7 @@
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="mb-1 fw-bold">Week {{.WeekNumberISO}}</h5>
-                    <small>{{.StartOfWeek.Format "Jan 2"}} - {{.EndOfWeek.Format "Jan 2, 2006"}}</small>
+                    <small>{{.StartOfWeek.Format $.DateFormat}} - {{.EndOfWeek.Format $.DateFormat}}</small>
                 </div>
                 {{if gt (len .Entries) 0}}
                 <div class="text-end">
@@ -53,7 +53,7 @@
                                     <input type="checkbox" name="entry_ids" value="{{.ID}}" class="entry-checkbox form-check-input">
                                 </td>
                                 <td>
-                                    <strong>{{.Start.Format "Mon, Jan 2"}}</strong>
+                                    <strong>{{.Start.Format $.DateFormat}}</strong>
                                 </td>
                                 <td class="text-muted">{{.Start.Format "15:04"}}</td>
                                 <td class="text-muted">{{.End.Format "15:04"}} {{if (or (ne .End.Day .Start.Day) (ne .End.Month .Start.Month) (ne .End.Year .Start.Year))}}<span class="fst-italic">({{$days := daysLater .Start .End}}{{$days}} day{{if gt $days 1}}s{{end}} later)</span>{{end}}</td>

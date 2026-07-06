@@ -91,6 +91,7 @@ func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) 
 		dataMap["Version"] = r.version
 		dataMap["Timezones"] = r.timezones
 		dataMap["Weekdays"] = r.weekdays
+		dataMap["DateFormat"] = "02.01.2006"
 	}
 
 	// ugly but this way we keep the strict order
