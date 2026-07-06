@@ -63,14 +63,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set short git commit SHA
+      - name: Set short git commit ref
         id: vars
         run: |
           refSlug=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_REF_SLUG=$refSlug" >> $GITHUB_ENV
-
-      - name: Confirm git commit SHA output
-        run: echo ${{ env.COMMIT_REF_SLUG }}
       
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -88,6 +85,7 @@ jobs:
             type=sha,format=long
             # set latest tag for default branch
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ env.COMMIT_REF_SLUG }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -95,9 +93,7 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels:
-            ${{ steps.meta.outputs.labels }}
-            ${{ env.COMMIT_REF_SLUG }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ env.COMMIT_REF_SLUG }}
           cache-from: type=gha
