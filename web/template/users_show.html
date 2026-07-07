@@ -29,9 +29,9 @@
         <div class="card-body">
             <dl class="row mb-0">
                 <dt class="col-sm-2 text-muted">Weekly Work Time</dt>
-                <dd class="col-sm-4"><span class="badge bg-primary-subtle text-primary-emphasis">{{.User.WeeklyWorkTime}}</span></dd>
+                <dd class="col-sm-4"><span class="badge bg-primary-subtle text-primary-emphasis">{{formatDuration .User.WeeklyWorkTime}}</span></dd>
                 <dt class="col-sm-2 text-muted">Granularity</dt>
-                <dd class="col-sm-4"><span class="badge bg-secondary-subtle text-secondary-emphasis">{{.User.TimesheetGranularity}}</span></dd>
+                <dd class="col-sm-4"><span class="badge bg-secondary-subtle text-secondary-emphasis">{{formatDuration .User.TimesheetGranularity}}</span></dd>
                 <dt class="col-sm-2 text-muted">Timezone</dt>
                 <dd class="col-sm-4"><span class="badge bg-secondary-subtle text-secondary-emphasis">{{.User.DefaultTimezone}}</span></dd>
                 <dt class="col-sm-2 text-muted">Week start</dt>
@@ -41,11 +41,11 @@
             </dl>
         </div>
         <div class="card-body">
-            <span class="text-muted">Logged: <b>{{ .TotalTimeLogged }}</b></span>
+            <span class="text-muted">Logged: <b>{{formatDuration .TotalTimeLogged }}</b></span>
             {{if gt .TotalDiff 0}}
-                <span class="badge rounded-pill bg-success ms-2">+{{.TotalDiff}} (overtime)</span>
+                <span class="badge rounded-pill bg-success ms-2">+{{formatDuration .TotalDiff}} (overtime)</span>
             {{else if lt .TotalDiff 0}}
-                <span class="badge rounded-pill bg-danger ms-2">{{.TotalDiff}} (undertime)</span>
+                <span class="badge rounded-pill bg-danger ms-2">{{formatDuration .TotalDiff}} (undertime)</span>
             {{else}}
                 <span class="badge rounded-pill bg-secondary ms-2">±0 (on track)</span>
             {{end}}
@@ -86,7 +86,7 @@
                             aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
+                    <p class="text-muted">Duration must be divisible by {{formatDuration .User.TimesheetGranularity}}</p>
                     {{ template "entry_form" . }}
                 </div>
                 <div class="modal-footer">

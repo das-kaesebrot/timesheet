@@ -38,8 +38,9 @@ func New(dir string, version string) (*Renderer, error) {
 				return t.Format("2006-01-02 15:04")
 			},
 			"formatDuration": func(d time.Duration) string {
-				hours := d.Hours()
-				return fmt.Sprintf("%.1f", hours)
+				totalMinutes := int64(math.Round(d.Minutes()))
+				hours, minutes := utility.Divmod(totalMinutes, 60)
+				return fmt.Sprintf("%02dh%02dm", hours, minutes)
 			},
 			"add": func(a, b int) int {
 				return a + b

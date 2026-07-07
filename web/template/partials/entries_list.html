@@ -11,11 +11,11 @@
                 </div>
                 {{if gt (len .Entries) 0}}
                 <div class="text-end">
-                    <div class="fs-4 fw-bold">{{.TimeLogged}}</div>
+                    <div class="fs-4 fw-bold">{{formatDuration .TimeLogged}}</div>
                     {{if gt .WeeklyDiff 0}}
-                        <span class="badge bg-success">+{{.WeeklyDiff}} (overtime)</span>
+                        <span class="badge bg-success">+{{formatDuration .WeeklyDiff}} (overtime)</span>
                     {{else if lt .WeeklyDiff 0}}
-                        <span class="badge bg-danger">{{.WeeklyDiff}} (undertime)</span>
+                        <span class="badge bg-danger">{{formatDuration .WeeklyDiff}} (undertime)</span>
                     {{else}}
                         <span class="badge bg-secondary">On target</span>
                     {{end}}
@@ -58,7 +58,7 @@
                                 <td class="text-muted">{{.Start.Format "15:04"}}</td>
                                 <td class="text-muted">{{.End.Format "15:04"}} {{if (or (ne .End.Day .Start.Day) (ne .End.Month .Start.Month) (ne .End.Year .Start.Year))}}<span class="fst-italic">({{$days := daysLater .Start .End}}{{$days}} day{{if gt $days 1}}s{{end}} later)</span>{{end}}</td>
                                 <td>
-                                    <span class="text-muted">{{.End.Sub .Start}}</span>
+                                    <span class="text-muted">{{formatDuration (.End.Sub .Start)}}</span>
                                 </td>
                                 <td>
                                     {{if .IsPaidTimeOff}}
@@ -100,13 +100,11 @@
                         <span>{{len .Entries}} {{if eq (len .Entries) 1}}entry{{else}}entries{{end}}</span>
                     </div>
                     <div>
-                        <span>Total: <strong>{{.TimeLogged}}</strong></span>
+                        <span>Total: <strong>{{formatDuration .TimeLogged}}</strong></span>
                         {{if gt .WeeklyDiff 0}}
-                            <span class="badge bg-success ms-2">+{{.WeeklyDiff}}</span>
+                            <span class="badge bg-success ms-2">+{{formatDuration .WeeklyDiff}}</span>
                         {{else if lt .WeeklyDiff 0}}
-                            <span class="badge bg-danger ms-2">{{.WeeklyDiff}}</span>
-                        {{else}}
-                            <span class="badge bg-secondary ms-2">±0</span>
+                            <span class="badge bg-danger ms-2">{{formatDuration .WeeklyDiff}}</span>
                         {{end}}
                     </div>
                 </div>
