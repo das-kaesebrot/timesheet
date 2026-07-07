@@ -38,7 +38,7 @@ func (r *Repository) ListUsers(ctx context.Context) ([]model.User, error) {
 }
 
 func (r *Repository) UpdateUser(ctx context.Context, user *model.User) error {
-	return r.db.WithContext(ctx).Save(user).Error
+	return r.db.WithContext(ctx).Omit("TimesheetEntries").Updates(user).Error
 }
 
 func (r *Repository) DeleteUser(ctx context.Context, id uuid.UUID) error {
