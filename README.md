@@ -1,6 +1,6 @@
 # timesheet
 
-timesheet is a web-based time tracking application that allows you to manage users and their timesheet entries with support for timezone-aware weekly summaries, CSV export, and natural language time input.
+timesheet is a web-based time tracking application that allows you to manage users and their timesheet entries with support for timezone-aware weekly summaries, CSV export and import.
 
 ## Features
 
@@ -8,8 +8,10 @@ timesheet is a web-based time tracking application that allows you to manage use
 - [x] timesheet entries with start/end times and descriptions
 - [x] timezone-aware entries
 - [x] weekly summaries with time logged and weekly diff
-- [x] CSV export
-- [ ] CSV import
+- [x] CSV export with optional date range filter
+- [x] CSV import with overlap validation
+- [x] overlap detection for new and edited entries
+- [x] light / dark mode
 
 ## Docker
 

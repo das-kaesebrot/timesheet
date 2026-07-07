@@ -14,22 +14,30 @@ A lightweight Go-based web application for tracking timesheet entries using exis
 timesheet/
 ├── cmd/
 │   └── server/
-│       └── main.go          # Web server entry point
+│       └── main.go              # Web server entry point
 ├── internal/
-│   ├── handler/             # HTTP handlers (net/http)
-│   ├── repository/          # GORM database operations
-│   ├── template/            # Go HTML templates
-│   └── model/               # Existing models (do not modify)
-├── templates/               # HTML templates
-│   ├── layout.html          # Base layout with Bootstrap + HTMX
-│   ├── users/
-│   │   ├── list.html
-│   │   ├── form.html
-│   │   └── ...
-│   └── entries/
-│       └── ...
+│   ├── handler/                 # HTTP handlers (net/http)
+│   ├── httperror/               # Structured HTTP error type
+│   ├── middleware/              # Logger + error recovery middleware
+│   ├── model/                   # GORM models (do not modify)
+│   ├── password/                # bcrypt password hashing (unused)
+│   ├── repository/              # GORM database operations
+│   ├── template/                # Go HTML template rendering engine
+│   └── utility/                 # Timezone, week, entry helpers
+├── web/
+│   ├── static/
+│   │   ├── js/
+│   │   │   └── script.js        # Dark mode toggle + batch-delete
+│   │   └── libs/
+│   │       └── bootstrap@5.3.8/ # Vendored Bootstrap 5.3.8
+│   └── template/
+│       ├── layouts/
+│       │   └── base.html        # Base layout with Bootstrap + HTMX
+│       ├── partials/            # Reusable template fragments
+│       └── *.html               # Page templates
+├── Dockerfile
 ├── go.mod
-└── main.go                  # Keep existing for GORM setup
+└── go.sum
 ```
 
 ## Feature Implementation Plan
@@ -69,37 +77,42 @@ timesheet/
 - [x] Pagination with configurable weeks per page (1, 5, 10) via `?page=&per_page=`
 
 ### Phase 6: Export Functionality
-- [x] CSV export endpoint (`GET /users/:id/export`)
-- [ ] Optional date range filtering (`?start=YYYY-MM-DD&end=YYYY-MM-DD`)
-- [ ] Handle nil granularity (allow any value) for exported entries
+- [x] CSV export endpoint (`GET /users/:id/entries/export`)
+- [x] Optional date range filtering (`?start=YYYY-MM-DD&end=YYYY-MM-DD`)
+- [x] Handle nil granularity (allow any value) for exported entries
 
 ### Phase 7: Error Handling
-- [ ] Validate form input server-side
-- [ ] Return meaningful error messages
-- [ ] Handle database errors gracefully
+- [x] Validate form input server-side (times, granularity, overlap, timezone, week day)
+- [x] Return meaningful error messages via `httperror` + `error.html`
+- [x] Handle database errors gracefully via `InternalServerError` + error middleware
+
+### Phase 8: Import Functionality
+- [x] CSV import page (`GET /users/:id/entries/import`)
+- [x] CSV import with MIME type validation, overlap detection, RFC3339 parsing
 
 ## API Routes
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/` | Home/Dashboard |
+| Any | `/` | Redirect to `/users` |
+| GET | `/favicon.ico` | Watch emoji favicon |
 | GET | `/users` | List all users |
 | GET | `/users/new` | Create user form |
 | POST | `/users` | Create user action |
-| GET | `/users/:id` | User details |
-| GET | `/users/:id/edit` | Edit user form |
-| PATCH | `/users/:id` | Update user action |
-| DELETE | `/users/:id` | Delete user action |
-| GET | `/users/:id/entries/new` | New entry form |
-| POST | `/users/:id/entries` | Create entry action |
-| GET | `/users/:id/entries` | List entries for user |
-| GET | `/users/:id/overview` | Weekly overview page |
-| GET | `/entries/:id/edit` | Edit entry form |
-| GET | `/entries/:id/edit` | Edit entry form |
-| PATCH | `/entries/:id` | Update entry action |
-| DELETE | `/entries/:id` | Delete entry action |
-| GET | `/users/:id/export` | Export timesheet to CSV |
-| GET | `/users/:id/export?start=&end=` | Export with time range filter |
+| GET | `/users/{id}` | User overview with weekly summaries |
+| GET | `/users/{id}/edit` | Edit user form |
+| POST | `/users/{id}` | Update user action |
+| POST | `/users/{id}/delete` | Delete user (soft-delete) |
+| POST | `/users/{id}/delete-entries` | Delete all entries for user |
+| GET | `/users/{id}/entries` | New entry form |
+| GET | `/users/{id}/entries/quick` | Natural language entry form (unfinished) |
+| POST | `/users/{id}/entries` | Create entry action |
+| GET | `/users/{id}/entries/export` | Export timesheet to CSV |
+| GET | `/users/{id}/entries/import` | CSV import form |
+| POST | `/users/{id}/entries/import` | Import CSV entries |
+| GET | `/entries/{id}/edit` | Edit entry form |
+| POST | `/entries/{id}` | Update entry action |
+| POST | `/users/{id}/entries/delete` | Batch delete entries |
 
 ## Key Implementation Details
 
@@ -116,15 +129,15 @@ timesheet/
 
 ### Export Format (CSV)
 ```csv
-user_id,username,start,end,description
-1,admin,2024-01-01T09:00:00Z,2024-01-01T17:00:00Z,Working on feature X
+start,end,is_paidtimeoff,description
+2024-01-01T09:00:00Z,2024-01-01T17:00:00Z,false,Working on feature X
 ```
 
-## Technology Stack
-- **Backend**: Go with standard `net/http` router
-- **Database**: SQLite with GORM (existing)
-- **Frontend**: Go templates, Bootstrap 5 (CDN), HTMX (CDN)
-- **Architecture**: Standard Go project layout (`/internal/`)
+### CSV Import Format
+```csv
+start,end,is_paidtimeoff,description
+2024-01-01T09:00:00Z,2024-01-01T17:00:00Z,false,Working on feature X
+```
 
 ## Notes
 - No JavaScript compilation steps
