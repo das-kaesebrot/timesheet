@@ -1,16 +1,31 @@
 {{define "title"}}Edit Entry{{end}}
+{{define "breadcrumb-items"}}
+<li class="breadcrumb-item"><a href="/users">Users</a></li>
+<li class="breadcrumb-item"><a href="/users/{{.User.ID}}">{{.User.Name}}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit Entry</li>
+{{end}}
 {{define "main"}}
-    <h1>Edit Entry</h1>
-    {{if .User.TimesheetGranularity}}
-    <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
-    {{end}}
-    <form method="POST" action="/entries/{{.Entry.ID}}">
-        {{ template "entry_form" . }}
-        <button type="submit" class="btn btn-primary">Update Entry</button>
-        <button type="submit" class="btn btn-danger" form="delete-{{.Entry.ID}}">Delete</button>
-        <a href="/users/{{.User.ID}}" class="btn btn-secondary">Cancel</a>
-    </form>
-    <form id="delete-{{.Entry.ID}}" action="/users/{{.User.ID}}/entries/delete" method="POST" class="d-inline">
-        <input type="hidden" name="entry_ids" value="{{.Entry.ID}}">
-    </form>
+<div class="container-fluid px-0">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center gap-3 bg-secondary-subtle text-secondary-emphasis">
+            <div class="d-flex align-items-center gap-3">
+                <h5 class="mb-0">Edit Entry</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            {{if .User.TimesheetGranularity}}
+            <p class="text-muted">Duration must be divisible by {{.User.TimesheetGranularity}}</p>
+            {{end}}
+            <form method="POST" action="/entries/{{.Entry.ID}}">
+                {{ template "entry_form" . }}
+                <button type="submit" class="btn btn-primary">Update Entry</button>
+                <button type="submit" class="btn btn-danger" form="delete-{{.Entry.ID}}">Delete</button>
+                <a href="/users/{{.User.ID}}" class="btn btn-secondary">Cancel</a>
+            </form>
+            <form id="delete-{{.Entry.ID}}" action="/users/{{.User.ID}}/entries/delete" method="POST" class="d-inline">
+                <input type="hidden" name="entry_ids" value="{{.Entry.ID}}">
+            </form>
+        </div>
+    </div>
+</div>
 {{end}}
