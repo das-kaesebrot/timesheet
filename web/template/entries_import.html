@@ -1,9 +1,12 @@
 {{define "title"}}Import Entries to user{{end}}
 {{define "main"}}
     <h1>Import Entries</h1>
-    <p>
-        CSV has to have the format:<br><code>start_date,end_date,is_paidtimeoff,description</code>
-    </p>
+    <div class="alert alert-warning" role="alert">
+        CSV has to have the following format:<br><code>start_date(RFC3339),end_date(RFC3339),is_paidtimeoff(bool),description(string)</code>
+    </div>
+    <div class="alert alert-info" role="alert">
+        If any errors are encountered during import, no new entries will be created.
+    </div>
     <form method="POST" action="/users/{{.User.ID}}/entries/import" enctype="multipart/form-data">
         {{ template "entries_import_form" . }}
         <button type="submit" class="btn btn-primary">Import</button>
