@@ -2,7 +2,7 @@ module github.com/das-kaesebrot/timesheet
 
 go 1.26.2
 
-require gorm.io/gorm v1.31.1
+require gorm.io/gorm v1.31.2
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
