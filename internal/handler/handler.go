@@ -541,15 +541,20 @@ func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) er
 		return httperror.BadRequest(fmt.Sprintf("Error reading CSV: %v", err))
 	}
 
+	skipHeader := r.Form.Get("skip_header") == "on"
+	if skipHeader && len(records) > 0 {
+		records = records[1:]
+	}
+
 	// just the header or nothing --> ignore the file
-	if len(records) <= 1 {
+	if len(records) < 1 {
 		http.Redirect(w, r, fmt.Sprintf("/users/%s", user.ID.String()), http.StatusFound)
 		return nil
 	}
 
 	existingEntries, _ := h.repo.GetTimesheetEntriesByUserID(r.Context(), userID)
 
-	for index, record := range records[1:] {
+	for index, record := range records {
 		if len(record) != 4 {
 			return httperror.BadRequest(fmt.Sprintf("CSV record has wrong length! %s", record))
 		}
