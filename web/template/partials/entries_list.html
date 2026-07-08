@@ -1,5 +1,8 @@
 {{define "entries_list"}}
 <div class="container-fluid px-0">
+    <div class="mb-3">
+        {{template "pagination_controls" .}}
+    </div>
     {{if gt (len .Summaries) 0}}
     {{range .Summaries}}
     <div class="week-summary mb-4">
