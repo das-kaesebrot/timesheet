@@ -89,17 +89,28 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 	availablePageSizes := []int{1, 5, 10}
 	page := 1
 	perPage := 5
+
 	if queryPage := r.URL.Query().Get("page"); queryPage != "" {
-		if n, err := strconv.Atoi(queryPage); err == nil && n > 0 {
-			page = n
+		n, err := strconv.Atoi(queryPage)
+		if err != nil {
+			return httperror.InternalServerError(err)
 		}
+		if n <= 0 {
+			return httperror.BadRequest("page has to be bigger than 0!")
+		}
+
+		page = n
 	}
+
 	if queryPerPage := r.URL.Query().Get("per_page"); queryPerPage != "" {
-		if n, err := strconv.Atoi(queryPerPage); err == nil {
-			for item := range availablePageSizes {
-				if item == n {
-					perPage = n
-				}
+		n, err := strconv.Atoi(queryPerPage)
+		if err != nil {
+			return httperror.InternalServerError(err)
+		}
+
+		for item := range availablePageSizes {
+			if item == n {
+				perPage = n
 			}
 		}
 	}
