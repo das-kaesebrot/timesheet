@@ -18,7 +18,7 @@
         {{end}}
         {{if gt $.TotalPages 1}}
         <li class="page-item {{if ge $.Page $.TotalPages}}disabled{{end}}">
-            <a class="page-link" href="?page={{$.Page}}&per_page={{$.PerPage}}" {{if ge $.Page $.TotalPages}}tabindex="-1" aria-disabled="true"{{end}}>›</a>
+            <a class="page-link" href="?page={{add $.Page 1}}&per_page={{$.PerPage}}" {{if ge $.Page $.TotalPages}}tabindex="-1" aria-disabled="true"{{end}}>›</a>
         </li>
         {{end}}
         {{if gt $.TotalPages 1}}
