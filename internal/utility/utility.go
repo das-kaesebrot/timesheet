@@ -28,5 +28,10 @@ func GetWeekdays() []time.Weekday {
 func Divmod(numerator, denominator int64) (quotient, remainder int64) {
 	quotient = numerator / denominator // integer division, decimals are truncated
 	remainder = numerator % denominator
+	// fix remainder so that it always returns a positive value
+	// https://www.reddit.com/r/golang/comments/bnvik4/modulo_in_golang/
+	if remainder < 0 {
+		remainder += denominator
+	}
 	return
 }
