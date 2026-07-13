@@ -119,8 +119,9 @@ func main() {
 	mux.HandleFunc("POST /users/{id}/entries/import", with(h.ImportEntriesToUser))
 
 	mux.HandleFunc("GET /entries/{id}/edit", with(h.GetEntryEdit))
+	mux.HandleFunc("GET /entries/{id}/delete", with(h.DeleteEntry))
 	mux.HandleFunc("POST /entries/{id}", with(h.PostEntryUpdate))
-	mux.HandleFunc("POST /users/{id}/entries/delete", with(h.PostEntryDelete))
+	mux.HandleFunc("POST /users/{id}/entries/delete", with(h.DeleteEntries))
 
 	host := os.Getenv("TIMESHEET_HOST")
 	if host == "" {

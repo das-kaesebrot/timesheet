@@ -80,11 +80,8 @@
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="/entries/{{.ID}}/edit" class="btn btn-outline-primary">Edit</a>
-                                        <button type="submit" class="btn btn-outline-danger" form="delete-{{.ID}}">Delete</button>
+                                        <a href="/entries/{{.ID}}/delete" class="btn btn-outline-danger">Delete</a>
                                     </div>
-                                    <form id="delete-{{.ID}}" action="/users/{{$.User.ID}}/entries/delete" method="POST" class="d-inline">
-                                        <input type="hidden" name="entry_ids" value="{{.ID}}">
-                                    </form>
                                 </td>
                             </tr>
                             {{end}}
