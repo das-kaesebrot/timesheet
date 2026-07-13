@@ -257,7 +257,7 @@ func TestGetEarliestTimesheetEntryByUserID(t *testing.T) {
 		t.Fatalf("CreateTimesheetEntry failed: %v", err)
 	}
 
-	got, err := repo.GetEarliestTimesheetEntryByUserID(context.Background(), user.ID)
+	got, err := repo.GetFirstTimesheetEntryByUserID(context.Background(), user.ID)
 	if err != nil {
 		t.Fatalf("GetEarliestTimesheetEntryByUserID failed: %v", err)
 	}
@@ -271,7 +271,7 @@ func TestGetEarliestTimesheetEntryByUserIDNotFound(t *testing.T) {
 	repo := setupTestDB(t)
 	user := setupUser(t, repo, "noearlyentry")
 
-	_, err := repo.GetEarliestTimesheetEntryByUserID(context.Background(), user.ID)
+	_, err := repo.GetFirstTimesheetEntryByUserID(context.Background(), user.ID)
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		t.Errorf("expected ErrRecordNotFound, got %v", err)
 	}

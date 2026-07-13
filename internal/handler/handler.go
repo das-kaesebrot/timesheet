@@ -689,13 +689,18 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request, orde
 		return nil, nil
 	}
 
-	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	firstEntry, err := h.repo.GetFirstTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	lastEntry, err := h.repo.GetLastTimesheetEntryByUserID(r.Context(), u.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	rangeStart := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
-	rangeEnd := utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+	rangeEnd := utility.GetNextWeekStartDate(lastEntry.Start, u.StartOfWeek)
 
 	if rangeEnd.Equal(rangeStart) {
 		rangeEnd = rangeEnd.AddDate(0, 0, 1)
@@ -731,14 +736,19 @@ func (h *Handler) GetWeeklySummariesForUser(u *model.User, r *http.Request, orde
 	return summaries, nil
 }
 
-func (h *Handler) getTotalTimeLoggedForUser(u *model.User, r *http.Request, includeCurrentWeek bool) (time.Duration, error) {
+func (h *Handler) getTotalTimeLoggedForUser(u *model.User, r *http.Request, includeLastWeek bool) (time.Duration, error) {
 	totalTimeLogged := time.Duration(0)
 
 	if amount, _ := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID); amount == 0 {
 		return 0, nil
 	}
 
-	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	firstEntry, err := h.repo.GetFirstTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	lastEntry, err := h.repo.GetLastTimesheetEntryByUserID(r.Context(), u.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -746,10 +756,10 @@ func (h *Handler) getTotalTimeLoggedForUser(u *model.User, r *http.Request, incl
 	firstWeekStartDate := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
 	var lastWeekStartDate time.Time
 
-	if includeCurrentWeek {
-		lastWeekStartDate = utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+	if includeLastWeek {
+		lastWeekStartDate = utility.GetNextWeekStartDate(lastEntry.Start, u.StartOfWeek)
 	} else {
-		lastWeekStartDate = utility.GetPreviousWeekStartDate(time.Now(), u.StartOfWeek)
+		lastWeekStartDate = utility.GetPreviousWeekStartDate(lastEntry.Start, u.StartOfWeek)
 	}
 
 	allEntries, err := h.repo.GetTimesheetEntriesByUserIDInRange(r.Context(), u.ID, firstWeekStartDate, lastWeekStartDate)
@@ -765,12 +775,17 @@ func (h *Handler) getTotalTimeLoggedForUser(u *model.User, r *http.Request, incl
 	return totalTimeLogged, nil
 }
 
-func (h *Handler) getTotalWeekNumLoggedForUser(u *model.User, r *http.Request, includeCurrentWeek bool) (int, error) {
+func (h *Handler) getTotalWeekNumLoggedForUser(u *model.User, r *http.Request, includeLastWeek bool) (int, error) {
 	if amount, _ := h.repo.CountTimesheetEntriesByUserID(r.Context(), u.ID); amount == 0 {
 		return 0, nil
 	}
 
-	firstEntry, err := h.repo.GetEarliestTimesheetEntryByUserID(r.Context(), u.ID)
+	firstEntry, err := h.repo.GetFirstTimesheetEntryByUserID(r.Context(), u.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	lastEntry, err := h.repo.GetLastTimesheetEntryByUserID(r.Context(), u.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -778,10 +793,10 @@ func (h *Handler) getTotalWeekNumLoggedForUser(u *model.User, r *http.Request, i
 	firstWeekStartDate := utility.GetPreviousWeekStartDate(firstEntry.Start, u.StartOfWeek)
 	var lastWeekStartDate time.Time
 
-	if includeCurrentWeek {
-		lastWeekStartDate = utility.GetNextWeekStartDate(time.Now(), u.StartOfWeek)
+	if includeLastWeek {
+		lastWeekStartDate = utility.GetNextWeekStartDate(lastEntry.Start, u.StartOfWeek)
 	} else {
-		lastWeekStartDate = utility.GetPreviousWeekStartDate(time.Now(), u.StartOfWeek)
+		lastWeekStartDate = utility.GetPreviousWeekStartDate(lastEntry.Start, u.StartOfWeek)
 	}
 
 	timeRangeLogged := lastWeekStartDate.Sub(firstWeekStartDate)
