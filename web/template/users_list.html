@@ -36,8 +36,8 @@
                                     <span class="badge bg-secondary">Inactive</span>
                                 {{end}}
                             </td>
-                            <td>{{.WeeklyWorkTime}}</td>
-                            <td>{{.TimesheetGranularity}}</td>
+                            <td>{{formatDuration .WeeklyWorkTime}}</td>
+                            <td>{{formatDuration .TimesheetGranularity}}</td>
                             <td class="text-muted">{{.DefaultTimezone}}</td>
                             <td class="text-end pe-4" onclick="event.stopPropagation()">
                                 <div class="btn-group btn-group-sm" role="group">
