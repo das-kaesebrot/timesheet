@@ -166,6 +166,7 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 		"AvailablePageSizes": availablePageSizes,
 		"TotalPages":         totalPages,
 		"TotalSummaries":     totalSummaries,
+		"Now":                time.Now(),
 	})
 	return nil
 }

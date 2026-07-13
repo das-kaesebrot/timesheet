@@ -65,6 +65,9 @@ func New(dir string, version string) (*Renderer, error) {
 				return s
 			},
 			"join": strings.Join,
+			"isAfter": func(checkAfter, base time.Time) bool {
+				return checkAfter.After(base)
+			},
 		},
 		weekdays: utility.GetWeekdays(),
 	}
