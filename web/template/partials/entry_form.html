@@ -60,31 +60,37 @@
     })
     })()
 </script>
+<div class="mb-3 form-floating">
+    <input type="datetime-local" name="start" id="input-date-start" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
+    <label for="input-date-start">Start</label>
+</div>
 <div class="mb-3 input-group">
     <span class="input-group-text">Start</span>
-    <input type="datetime-local" name="start" id="input-date-start" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.Start.Format "2006-01-02T15:04"}}" required>
     <button class="btn btn-outline-secondary" id="button-start-now" type="button">~Now</button>
     <button class="btn btn-outline-secondary" id="button-start-dec" type="button">-{{.User.TimesheetGranularity}}</button>
     <button class="btn btn-outline-secondary" id="button-start-inc" type="button">+{{.User.TimesheetGranularity}}</button>
 </div>
+<div class="mb-3 form-floating">
+    <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
+    <label for="input-date-end">End</label>
+</div>
 <div class="mb-3 input-group">
     <span class="input-group-text">End</span>
-    <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
     <button class="btn btn-outline-secondary" id="button-end-now" type="button">~Now</button>
     <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{.User.TimesheetGranularity}}</button>
     <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{.User.TimesheetGranularity}}</button>
 </div>
-<div class="mb-3 input-group">
-    <span class="input-group-text">Timezone</span>
+<div class="mb-3 form-floating">
     <select class="form-select" id="select-timezone" name="timezone">
     {{range .Timezones}}
         <option {{ if (eq . $.User.DefaultTimezone)}}selected {{end}}value="{{ . }}">{{ . }}</option>
     {{end}}
     </select>
+    <label for="select-timezone">Timezone</label>
 </div>
-<div class="mb-3 input-group">
-    <span class="input-group-text">Description</span>
-    <input type="text" class="form-control" name="description" value="{{if .Entry.Description}}{{.Entry.Description}}{{end}}" aria-describedby="basic-addon3 basic-addon4">
+<div class="mb-3 form-floating">
+    <input type="text" class="form-control" id="select-description" name="description" value="{{if .Entry.Description}}{{.Entry.Description}}{{end}}" aria-describedby="basic-addon3 basic-addon4">
+    <label for="select-description">Description</label>
 </div>
 <div class="mb-3 input-group">
     <div class="form-check">
