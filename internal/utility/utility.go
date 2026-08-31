@@ -21,17 +21,15 @@ func GetWeekdays() []time.Weekday {
 	}
 }
 
-// Source - https://stackoverflow.com/a/43945812
-// Posted by Kaedys
-// Retrieved 2026-07-07, License - CC BY-SA 3.0
-
+// Source - https://stackoverflow.com/a/74940188
+// Posted by user6705546, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-08-31, License - CC BY-SA 4.0
 func Divmod(numerator, denominator int64) (quotient, remainder int64) {
-	quotient = numerator / denominator // integer division, decimals are truncated
+	quotient = numerator / denominator
 	remainder = numerator % denominator
-	// fix remainder so that it always returns a positive value
-	// https://www.reddit.com/r/golang/comments/bnvik4/modulo_in_golang/
-	if remainder < 0 {
+	if remainder != 0 && numerator*denominator < 0 {
 		remainder += denominator
+		quotient--
 	}
 	return
 }
