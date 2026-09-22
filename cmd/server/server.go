@@ -1,9 +1,11 @@
-package main
+package server
 
 import (
+	"embed"
 	"errors"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -12,13 +14,16 @@ import (
 	"github.com/das-kaesebrot/timesheet/internal/handler"
 	"github.com/das-kaesebrot/timesheet/internal/middleware"
 	"github.com/das-kaesebrot/timesheet/internal/model"
+	"github.com/das-kaesebrot/timesheet/internal/renderer"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
-	"github.com/das-kaesebrot/timesheet/internal/template"
+	"github.com/das-kaesebrot/timesheet/internal/utility"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
-var Version = "dev"
+var templateFilesRoot = "web/template"
+var staticFilesRoot = "web/static"
+var webStaticFilesRoot = "static"
 
 // returns nil if file exists and is read/writable, otherwise returns the underlying err
 func checkFileAccess(path string) error {
@@ -36,18 +41,18 @@ func checkFileAccess(path string) error {
 	return nil
 }
 
-func main() {
+func Run(webFS embed.FS, version string, gitHash string) error {
 	versionFlag := false
 	flag.BoolVar(&versionFlag, "v", false, "print version information")
 	flag.BoolVar(&versionFlag, "version", false, "print version information")
 	flag.Parse()
 
 	if versionFlag {
-		fmt.Printf("%v\n", Version)
-		return
+		fmt.Printf("%v\n", version)
+		return nil
 	}
 
-	log.Printf("Version: %v", Version)
+	log.Printf("Version: %v", version)
 
 	dbFile := path.Clean(os.Getenv("TIMESHEET_DB_FILE"))
 	if dbFile == "." {
@@ -60,30 +65,37 @@ func main() {
 	if errors.Is(err, os.ErrNotExist) {
 		log.Printf("database file doesn't exist yet, creating it")
 	} else if err != nil {
-		log.Panicf("failed reading database file: %v", err)
+		return fmt.Errorf("failed reading database file: %w", err)
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
 	if err != nil {
-		log.Panicf("failed to connect database: %v", err)
+		return fmt.Errorf("failed to connect database: %w", err)
 	}
 
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.TimesheetEntry{})
 
-	webDir := path.Clean(os.Getenv("TIMESHEET_WEB_DIR"))
-
-	if webDir == "." {
-		webDir = "web"
+	timezones, err := utility.GetAllTimezones(true)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve timezones: %w", err)
 	}
+	log.Printf("Found OS timezones: %v", timezones)
 
 	repo := repository.New(db)
-	renderer, err := template.New(path.Join(webDir, "template"), Version)
+	renderer, err := renderer.New(webFS, staticFilesRoot, webStaticFilesRoot, templateFilesRoot, ".html", map[string]any{
+		"StaticLibsDir":    "/" + webStaticFilesRoot + "/libs",
+		"StaticScriptsDir": "/" + webStaticFilesRoot + "/js",
+		"Version":          version,
+		"Timezones":        timezones,
+		"Weekdays":         utility.GetWeekdays(),
+		"DateFormat":       "02.01.2006",
+	})
 	if err != nil {
-		log.Panicf("failed to load templates: %v", err)
+		return fmt.Errorf("Error while creating renderer: %w", err)
 	}
 
-	h := handler.New(repo, renderer)
+	h := handler.New(repo, renderer, timezones)
 
 	mux := http.NewServeMux()
 
@@ -96,7 +108,11 @@ func main() {
 		return middleware.Chain(eh(fn), handlerMiddleware...)
 	}
 
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(path.Join(webDir, "static")))))
+	staticFS, err := fs.Sub(webFS, staticFilesRoot)
+	if err != nil {
+		return fmt.Errorf("Error while creating sub FS for static file server: %w", err)
+	}
+	mux.Handle(fmt.Sprintf("GET /%s/", webStaticFilesRoot), http.StripPrefix("/"+webStaticFilesRoot+"/", http.FileServerFS(staticFS)))
 	mux.HandleFunc("/", with(h.Root))
 
 	mux.HandleFunc("GET /favicon.ico", eh(h.GetFavicon))
@@ -134,6 +150,5 @@ func main() {
 	}
 
 	log.Printf("Starting server on host %s:%s", host, port)
-	log.Printf("Using '%s' as web dir", webDir)
-	log.Fatal(http.ListenAndServe(host+":"+port, mux))
+	return http.ListenAndServe(host+":"+port, mux)
 }

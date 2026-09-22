@@ -2,6 +2,7 @@ package utility
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"time"
 )
@@ -60,4 +61,8 @@ func GetFormattedDuration(d time.Duration, compressed bool) string {
 	}
 
 	return result
+}
+
+func HandleErr(msg string, err error) {
+	log.Fatalf("Fatal error encountered: %s: %v", msg, err)
 }
