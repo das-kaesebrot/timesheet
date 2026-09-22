@@ -20,8 +20,9 @@ import (
 )
 
 type Handler struct {
-	repo     *repository.Repository
-	renderer *template.Renderer
+	repo               *repository.Repository
+	renderer           *template.Renderer
+	availableTimezones []string
 }
 
 type SortOrder int
@@ -45,8 +46,8 @@ var validCsvMimeTypes = []string{
 	"text/x-comma-separated-values",
 }
 
-func New(repo *repository.Repository, renderer *template.Renderer) *Handler {
-	return &Handler{repo: repo, renderer: renderer}
+func New(repo *repository.Repository, renderer *template.Renderer, timezones []string) *Handler {
+	return &Handler{repo: repo, renderer: renderer, availableTimezones: timezones}
 }
 
 // catchall route
@@ -180,7 +181,7 @@ func (h *Handler) PostUserNew(w http.ResponseWriter, r *http.Request) error {
 	if err := r.ParseForm(); err != nil {
 		return httperror.New(http.StatusBadRequest, "Invalid form data", err)
 	}
-	userUpdate, err := parseUserForm(r.PostForm)
+	userUpdate, err := h.parseUserForm(r.PostForm)
 	if err != nil {
 		return httperror.New(http.StatusBadRequest, "Invalid user data", err)
 	}
@@ -222,7 +223,7 @@ func (h *Handler) PostUserUpdate(w http.ResponseWriter, r *http.Request) error {
 	if err := r.ParseForm(); err != nil {
 		return httperror.New(http.StatusBadRequest, "Invalid form data", err)
 	}
-	userUpdate, err := parseUserForm(r.PostForm)
+	userUpdate, err := h.parseUserForm(r.PostForm)
 	if err != nil {
 		return httperror.New(http.StatusBadRequest, "Invalid user data", err)
 	}
@@ -805,7 +806,7 @@ func (h *Handler) getTotalWeekNumLoggedForUser(u *model.User, r *http.Request, i
 	return int(weeksLogged), nil
 }
 
-func parseUserForm(form url.Values) (*model.UserUpdate, error) {
+func (h *Handler) parseUserForm(form url.Values) (*model.UserUpdate, error) {
 	var userUpdate = new(model.UserUpdate)
 
 	userUpdate.Name = form.Get("name")
@@ -834,12 +835,8 @@ func parseUserForm(form url.Values) (*model.UserUpdate, error) {
 	parsedWeekStartDay := time.Weekday(n)
 	userUpdate.StartOfWeek = &parsedWeekStartDay
 
-	availableTimezones, err := utility.GetAllTimezones(true)
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
 	timezone := form.Get("default_timezone")
-	if !slices.Contains(availableTimezones, timezone) {
+	if !slices.Contains(h.availableTimezones, timezone) {
 		return nil, fmt.Errorf("Given timezone is not a valid timezone! %w", err)
 	}
 	userUpdate.DefaultTimezone = timezone
