@@ -3,6 +3,7 @@ package utility
 import (
 	"errors"
 	"testing"
+	"time"
 )
 
 func TestAssertReturnsValue(t *testing.T) {
@@ -94,6 +95,60 @@ func TestDivmod(t *testing.T) {
 			}
 			if got := q*tt.denominator + r; got != tt.numerator {
 				t.Errorf("invariant violated: %d*%d + %d = %d, want %d", q, tt.denominator, r, got, tt.numerator)
+			}
+		})
+	}
+}
+
+func TestGetFormattedDuration(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      time.Duration
+		compressed bool
+		output     string
+	}{
+		{name: "01:00", input: time.Duration(1) * time.Hour, compressed: false, output: "01h00m"},
+		{name: "01:30", input: time.Duration(1)*time.Hour + time.Duration(30)*time.Minute, compressed: false, output: "01h30m"},
+		{name: "01:14", input: time.Duration(1)*time.Hour + time.Duration(14)*time.Minute, compressed: false, output: "01h14m"},
+		{name: "01:47", input: time.Duration(1)*time.Hour + time.Duration(47)*time.Minute, compressed: false, output: "01h47m"},
+		{name: "36:00", input: time.Duration(36) * time.Hour, compressed: false, output: "36h00m"},
+		{name: "36:30", input: time.Duration(36)*time.Hour + time.Duration(30)*time.Minute, compressed: false, output: "36h30m"},
+		{name: "01:14", input: time.Duration(36)*time.Hour + time.Duration(14)*time.Minute, compressed: false, output: "36h14m"},
+		{name: "01:47", input: time.Duration(36)*time.Hour + time.Duration(47)*time.Minute, compressed: false, output: "36h47m"},
+
+		{name: "-01:00", input: -1 * time.Duration(1) * time.Hour, compressed: false, output: "-01h00m"},
+		{name: "-01:30", input: -1 * (time.Duration(1)*time.Hour + time.Duration(30)*time.Minute), compressed: false, output: "-01h30m"},
+		{name: "-01:14", input: -1 * (time.Duration(1)*time.Hour + time.Duration(14)*time.Minute), compressed: false, output: "-01h14m"},
+		{name: "-01:47", input: -1 * (time.Duration(1)*time.Hour + time.Duration(47)*time.Minute), compressed: false, output: "-01h47m"},
+		{name: "-36:00", input: -1 * (time.Duration(36) * time.Hour), compressed: false, output: "-36h00m"},
+		{name: "-36:30", input: -1 * (time.Duration(36)*time.Hour + time.Duration(30)*time.Minute), compressed: false, output: "-36h30m"},
+		{name: "-36:14", input: -1 * (time.Duration(36)*time.Hour + time.Duration(14)*time.Minute), compressed: false, output: "-36h14m"},
+		{name: "-36:47", input: -1 * (time.Duration(36)*time.Hour + time.Duration(47)*time.Minute), compressed: false, output: "-36h47m"},
+
+		{name: "01:00", input: time.Duration(1) * time.Hour, compressed: true, output: "01h"},
+		{name: "01:30", input: time.Duration(1)*time.Hour + time.Duration(30)*time.Minute, compressed: true, output: "01h30m"},
+		{name: "01:14", input: time.Duration(1)*time.Hour + time.Duration(14)*time.Minute, compressed: true, output: "01h14m"},
+		{name: "01:47", input: time.Duration(1)*time.Hour + time.Duration(47)*time.Minute, compressed: true, output: "01h47m"},
+		{name: "36:00", input: time.Duration(36) * time.Hour, compressed: true, output: "36h"},
+		{name: "36:30", input: time.Duration(36)*time.Hour + time.Duration(30)*time.Minute, compressed: true, output: "36h30m"},
+		{name: "01:14", input: time.Duration(36)*time.Hour + time.Duration(14)*time.Minute, compressed: true, output: "36h14m"},
+		{name: "01:47", input: time.Duration(36)*time.Hour + time.Duration(47)*time.Minute, compressed: true, output: "36h47m"},
+
+		{name: "-01:00", input: -1 * time.Duration(1) * time.Hour, compressed: true, output: "-01h"},
+		{name: "-01:30", input: -1 * (time.Duration(1)*time.Hour + time.Duration(30)*time.Minute), compressed: true, output: "-01h30m"},
+		{name: "-01:14", input: -1 * (time.Duration(1)*time.Hour + time.Duration(14)*time.Minute), compressed: true, output: "-01h14m"},
+		{name: "-01:47", input: -1 * (time.Duration(1)*time.Hour + time.Duration(47)*time.Minute), compressed: true, output: "-01h47m"},
+		{name: "-36:00", input: -1 * (time.Duration(36) * time.Hour), compressed: true, output: "-36h"},
+		{name: "-36:30", input: -1 * (time.Duration(36)*time.Hour + time.Duration(30)*time.Minute), compressed: true, output: "-36h30m"},
+		{name: "-36:14", input: -1 * (time.Duration(36)*time.Hour + time.Duration(14)*time.Minute), compressed: true, output: "-36h14m"},
+		{name: "-36:47", input: -1 * (time.Duration(36)*time.Hour + time.Duration(47)*time.Minute), compressed: true, output: "-36h47m"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := GetFormattedDuration(tt.input, tt.compressed)
+			if result != tt.output {
+				t.Errorf("GetFormattedDuration(%v, %v) result = '%s', want '%s'", tt.input, tt.compressed, result, tt.output)
 			}
 		})
 	}
