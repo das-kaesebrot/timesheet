@@ -1,4 +1,4 @@
-module github.com/das-kaesebrot/timesheet
+module dev.kaesebrot.eu/go/timesheet
 
 go 1.26.2
 

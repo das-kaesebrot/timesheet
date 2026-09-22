@@ -3,7 +3,7 @@ package utility
 import (
 	"time"
 
-	"github.com/das-kaesebrot/timesheet/internal/model"
+	"dev.kaesebrot.eu/go/timesheet/internal/model"
 )
 
 func SumEntryDurations(entries []*model.TimesheetEntry) (duration time.Duration) {

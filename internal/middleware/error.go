@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/das-kaesebrot/timesheet/internal/httperror"
-	"github.com/das-kaesebrot/timesheet/internal/renderer"
+	"dev.kaesebrot.eu/go/timesheet/internal/httperror"
+	"dev.kaesebrot.eu/go/timesheet/internal/renderer"
 )
 
 func ErrorHandler(renderer *renderer.Renderer) func(func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {

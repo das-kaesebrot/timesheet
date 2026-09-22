@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/das-kaesebrot/timesheet/internal/model"
+	"dev.kaesebrot.eu/go/timesheet/internal/model"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

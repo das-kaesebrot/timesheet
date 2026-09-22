@@ -4,7 +4,7 @@ import (
 	"embed"
 	"log"
 
-	"github.com/das-kaesebrot/timesheet/cmd/server"
+	"dev.kaesebrot.eu/go/timesheet/cmd/server"
 )
 
 var (

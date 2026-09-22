@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/das-kaesebrot/timesheet/internal/utility"
+	"dev.kaesebrot.eu/go/timesheet/internal/utility"
 )
 
 type Renderer struct {

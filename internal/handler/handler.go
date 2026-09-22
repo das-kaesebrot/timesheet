@@ -11,11 +11,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/das-kaesebrot/timesheet/internal/httperror"
-	"github.com/das-kaesebrot/timesheet/internal/model"
-	"github.com/das-kaesebrot/timesheet/internal/renderer"
-	"github.com/das-kaesebrot/timesheet/internal/repository"
-	"github.com/das-kaesebrot/timesheet/internal/utility"
+	"dev.kaesebrot.eu/go/timesheet/internal/httperror"
+	"dev.kaesebrot.eu/go/timesheet/internal/model"
+	"dev.kaesebrot.eu/go/timesheet/internal/renderer"
+	"dev.kaesebrot.eu/go/timesheet/internal/repository"
+	"dev.kaesebrot.eu/go/timesheet/internal/utility"
 	"github.com/google/uuid"
 )
 

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/das-kaesebrot/timesheet/internal/model"
+	"dev.kaesebrot.eu/go/timesheet/internal/model"
 	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
 	"gorm.io/gorm"

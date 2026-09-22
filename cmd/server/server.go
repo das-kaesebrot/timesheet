@@ -11,12 +11,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/das-kaesebrot/timesheet/internal/handler"
-	"github.com/das-kaesebrot/timesheet/internal/middleware"
-	"github.com/das-kaesebrot/timesheet/internal/model"
-	"github.com/das-kaesebrot/timesheet/internal/renderer"
-	"github.com/das-kaesebrot/timesheet/internal/repository"
-	"github.com/das-kaesebrot/timesheet/internal/utility"
+	"dev.kaesebrot.eu/go/timesheet/internal/handler"
+	"dev.kaesebrot.eu/go/timesheet/internal/middleware"
+	"dev.kaesebrot.eu/go/timesheet/internal/model"
+	"dev.kaesebrot.eu/go/timesheet/internal/renderer"
+	"dev.kaesebrot.eu/go/timesheet/internal/repository"
+	"dev.kaesebrot.eu/go/timesheet/internal/utility"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
