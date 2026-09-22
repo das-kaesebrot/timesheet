@@ -1,9 +1,12 @@
 package template
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
-	"log"
+	"io/fs"
+	"log/slog"
+	"maps"
 	"math"
 	"net/http"
 	"os"
@@ -15,104 +18,135 @@ import (
 )
 
 type Renderer struct {
-	dir       string
-	funcs     template.FuncMap
-	layouts   *template.Template
-	templates map[string]string
-	weekdays  []time.Weekday
-	timezones []string
-	version   string
+	funcs              template.FuncMap
+	templates          map[string]*template.Template
+	defaultData        map[string]any
+	staticHashCache    map[string]string
+	webFS              embed.FS
+	staticFilesRoot    string
+	webStaticFilesRoot string
+	templateSuffix     string
 }
 
-func New(dir string, version string) (*Renderer, error) {
+func New(webFS embed.FS, staticFilesRoot string, webStaticFilesRoot string, templateFilesRoot string, templateSuffix string, defaultData map[string]any) (*Renderer, error) {
 	r := &Renderer{
-		dir: dir,
-		funcs: template.FuncMap{
-			"formatDate": func(t time.Time) string {
-				return t.Format("2006-01-02")
-			},
-			"formatDateTime": func(t time.Time) string {
-				return t.Format("2006-01-02T15:04")
-			},
-			"formatDateTimeLocal": func(t time.Time) string {
-				return t.Format("2006-01-02 15:04")
-			},
-			"formatDuration": func(d time.Duration) string {
-				return utility.GetFormattedDuration(d, false)
-			},
-			"formatDurationCompressed": func(d time.Duration) string {
-				return utility.GetFormattedDuration(d, true)
-			},
-			"add": func(a, b int) int {
-				return a + b
-			},
-			"sub": func(a, b int) int {
-				return a - b
-			},
-			"daysLater": func(start, end time.Time) int {
-				zeroedStart := utility.ZeroTimeComponents(start)
-				diff := end.Sub(zeroedStart)
-				return int(math.Floor(diff.Hours() / 24.0))
-			},
-			"seq": func(start, end int) []int {
-				n := end - start + 1
-				if n <= 0 {
-					return nil
-				}
-				s := make([]int, n)
-				for i := range s {
-					s[i] = start + i
-				}
-				return s
-			},
-			"join": strings.Join,
-			"isAfter": func(checkAfter, base time.Time) bool {
-				return checkAfter.After(base)
-			},
-		},
-		weekdays: utility.GetWeekdays(),
+		defaultData:        defaultData,
+		templates:          make(map[string]*template.Template),
+		staticHashCache:    make(map[string]string),
+		webFS:              webFS,
+		staticFilesRoot:    strings.TrimSuffix(staticFilesRoot, "/"),
+		webStaticFilesRoot: strings.TrimSuffix(webStaticFilesRoot, "/"),
+		templateSuffix:     templateSuffix,
 	}
 
-	availableTimezones, err := utility.GetAllTimezones(true)
+	r.funcs = template.FuncMap{
+		"formatDate": func(t time.Time) string {
+			return t.Format("2006-01-02")
+		},
+		"formatDateTime": func(t time.Time) string {
+			return t.Format("2006-01-02T15:04")
+		},
+		"formatDateTimeLocal": func(t time.Time) string {
+			return t.Format("2006-01-02 15:04")
+		},
+		"formatDuration": func(d time.Duration) string {
+			return utility.GetFormattedDuration(d, false)
+		},
+		"formatDurationCompressed": func(d time.Duration) string {
+			return utility.GetFormattedDuration(d, true)
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"sub": func(a, b int) int {
+			return a - b
+		},
+		"daysLater": func(start, end time.Time) int {
+			zeroedStart := utility.ZeroTimeComponents(start)
+			diff := end.Sub(zeroedStart)
+			return int(math.Floor(diff.Hours() / 24.0))
+		},
+		"seq": func(start, end int) []int {
+			n := end - start + 1
+			if n <= 0 {
+				return nil
+			}
+			s := make([]int, n)
+			for i := range s {
+				s[i] = start + i
+			}
+			return s
+		},
+		"join": strings.Join,
+		"isAfter": func(checkAfter, base time.Time) bool {
+			return checkAfter.After(base)
+		},
+	}
+
+	templateFS, err := fs.Sub(webFS, templateFilesRoot)
 	if err != nil {
 		return nil, err
 	}
-	r.timezones = availableTimezones
 
-	log.Printf("Found OS timezones: %v", availableTimezones)
-
-	r.version = version
+	err = r.initTemplates(templateFS)
+	if err != nil {
+		return nil, err
+	}
 
 	return r, nil
 }
 
-func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
-	partials, err := filepath.Glob(filepath.Join(r.dir, "partials", "*.html"))
+func (r *Renderer) initTemplates(templateFS fs.FS) error {
+	templateSuffix := r.templateSuffix
+	baseTemplateName := filepath.Join("base" + templateSuffix)
+	partials, err := fs.Glob(templateFS, filepath.Join("partials", "*"+templateSuffix))
 	if err != nil {
-		r.handleError(w, err)
+		return err
 	}
+	baseFiles := append([]string{baseTemplateName}, partials...)
 
-	if dataMap, ok := data.(map[string]interface{}); ok {
-		dataMap["Version"] = r.version
-		dataMap["Timezones"] = r.timezones
-		dataMap["Weekdays"] = r.weekdays
-		dataMap["DateFormat"] = "02.01.2006"
-	}
-
-	// ugly but this way we keep the strict order
-	templateFiles := append(append([]string{filepath.Join(r.dir, "layouts", "base.html")}, partials...), filepath.Join(r.dir, name+".html"))
-
-	t := template.New("base.html").Funcs(r.funcs)
-	t, err = t.ParseFiles(templateFiles...)
+	foundLayoutFiles, err := fs.Glob(templateFS, filepath.Join("layouts", "*"+templateSuffix))
 	if err != nil {
-		r.handleError(w, err)
+		return err
 	}
 
-	err = t.Execute(w, data)
-
+	slog.Debug("Parsing base template", "baseTemplateName", baseTemplateName, "baseFiles", baseFiles)
+	baseTemplate, err := template.New(baseTemplateName).Funcs(r.funcs).ParseFS(templateFS, baseFiles...)
 	if err != nil {
-		r.handleError(w, err)
+		return err
 	}
+	// https://stackoverflow.com/questions/50842389/parsing-multiple-templates-in-go
+	for _, layoutFile := range foundLayoutFiles {
+		layoutName := filepath.Base(layoutFile)
+		slog.Debug("Parsing layout", "templateName", layoutName)
+
+		templ, err := baseTemplate.Clone()
+		if err != nil {
+			return err
+		}
+		templ, err = templ.ParseFS(templateFS, layoutFile)
+		if err != nil {
+			return err
+		}
+
+		r.templates[layoutName] = templ
+	}
+
+	return nil
+}
+
+func (r *Renderer) Render(w http.ResponseWriter, templateName string, data map[string]any) error {
+	combinedData := r.defaultData
+	templateName = templateName + r.templateSuffix
+
+	maps.Copy(combinedData, data)
+
+	t, ok := r.templates[templateName]
+	if !ok {
+		return fmt.Errorf("Template '%s' doesn't exist!", templateName)
+	}
+
+	return t.Execute(w, combinedData)
 }
 
 func (r *Renderer) handleError(w http.ResponseWriter, err error) {
