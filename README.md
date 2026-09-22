@@ -31,8 +31,7 @@ user@machine:~$ docker run --rm -it -p 8080:8080 ghcr.io/das-kaesebrot/timesheet
 Clone the repository and build the binary:
 
 ```bash
-cd timesheet
-go build -o timesheet ./cmd/server
+go build -o timesheet
 ./timesheet
 ```
 
