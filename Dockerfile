@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 # https://jerrynsh.com/3-easy-ways-to-add-version-flag-in-go/
-RUN go build -v -ldflags "-X 'main.Version=${VERSION}'" -o /usr/local/bin/app ./cmd/server/main.go
+RUN go build -v -ldflags "-X 'main.Version=${VERSION}'" -o /usr/local/bin/app main.go
 
 FROM docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
 
