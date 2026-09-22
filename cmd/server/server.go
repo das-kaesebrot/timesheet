@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -81,15 +82,10 @@ func Run(webFS embed.FS, version string, gitHash string) error {
 	}
 	log.Printf("Found OS timezones: %v", timezones)
 
-	webDir := path.Clean(os.Getenv("TIMESHEET_WEB_DIR"))
-
-	if webDir == "." {
-		webDir = "web"
-	}
-
 	repo := repository.New(db)
 	renderer, err := renderer.New(webFS, staticFilesRoot, webStaticFilesRoot, templateFilesRoot, ".html", map[string]any{
-		"StaticLibsSubDir": "/" + webStaticFilesRoot + "/libs",
+		"StaticLibsDir":    "/" + webStaticFilesRoot + "/libs",
+		"StaticScriptsDir": "/" + webStaticFilesRoot + "/js",
 		"Version":          version,
 		"Timezones":        timezones,
 		"Weekdays":         utility.GetWeekdays(),
@@ -112,7 +108,11 @@ func Run(webFS embed.FS, version string, gitHash string) error {
 		return middleware.Chain(eh(fn), handlerMiddleware...)
 	}
 
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(path.Join(webDir, "static")))))
+	staticFS, err := fs.Sub(webFS, staticFilesRoot)
+	if err != nil {
+		return fmt.Errorf("Error while creating sub FS for static file server: %w", err)
+	}
+	mux.Handle(fmt.Sprintf("GET /%s/", webStaticFilesRoot), http.StripPrefix("/"+webStaticFilesRoot+"/", http.FileServerFS(staticFS)))
 	mux.HandleFunc("/", with(h.Root))
 
 	mux.HandleFunc("GET /favicon.ico", eh(h.GetFavicon))
@@ -150,6 +150,5 @@ func Run(webFS embed.FS, version string, gitHash string) error {
 	}
 
 	log.Printf("Starting server on host %s:%s", host, port)
-	log.Printf("Using '%s' as web dir", webDir)
 	return http.ListenAndServe(host+":"+port, mux)
 }

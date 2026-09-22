@@ -18,8 +18,6 @@ ARG APP_WORKDIR="/var/opt/timesheet"
 ARG RUN_UID="10020"
 ARG RUN_USER="timesheet"
 
-ARG TIMESHEET_WEB_DIR="${APP_WORKDIR}/web"
-ENV TIMESHEET_WEB_DIR="${TIMESHEET_WEB_DIR}"
 ARG TIMESHEET_DATA_DIR="${APP_WORKDIR}/data"
 ENV TIMESHEET_DB_FILE="${TIMESHEET_DATA_DIR}/timesheet.db"
 
@@ -31,7 +29,6 @@ RUN addgroup -g ${RUN_UID} ${RUN_USER} && \
 WORKDIR ${APP_WORKDIR}
 
 COPY --from=build /usr/local/bin/app /usr/local/bin/timesheet
-COPY web "${TIMESHEET_WEB_DIR}"
 WORKDIR "${APP_WORKDIR}/data"
 USER ${RUN_USER}
 
