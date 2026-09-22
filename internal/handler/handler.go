@@ -13,15 +13,15 @@ import (
 
 	"github.com/das-kaesebrot/timesheet/internal/httperror"
 	"github.com/das-kaesebrot/timesheet/internal/model"
+	"github.com/das-kaesebrot/timesheet/internal/renderer"
 	"github.com/das-kaesebrot/timesheet/internal/repository"
-	"github.com/das-kaesebrot/timesheet/internal/template"
 	"github.com/das-kaesebrot/timesheet/internal/utility"
 	"github.com/google/uuid"
 )
 
 type Handler struct {
 	repo               *repository.Repository
-	renderer           *template.Renderer
+	renderer           *renderer.Renderer
 	availableTimezones []string
 }
 
@@ -46,7 +46,7 @@ var validCsvMimeTypes = []string{
 	"text/x-comma-separated-values",
 }
 
-func New(repo *repository.Repository, renderer *template.Renderer, timezones []string) *Handler {
+func New(repo *repository.Repository, renderer *renderer.Renderer, timezones []string) *Handler {
 	return &Handler{repo: repo, renderer: renderer, availableTimezones: timezones}
 }
 

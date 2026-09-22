@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/das-kaesebrot/timesheet/internal/httperror"
-	"github.com/das-kaesebrot/timesheet/internal/template"
+	"github.com/das-kaesebrot/timesheet/internal/renderer"
 )
 
-func ErrorHandler(renderer *template.Renderer) func(func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
+func ErrorHandler(renderer *renderer.Renderer) func(func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
 	return func(next func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			err := next(w, r)
