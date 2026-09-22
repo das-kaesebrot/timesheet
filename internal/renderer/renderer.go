@@ -136,7 +136,7 @@ func (r *Renderer) initTemplates(templateFS fs.FS) error {
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, templateName string, data map[string]any) error {
-	combinedData := r.defaultData
+	combinedData := maps.Clone(r.defaultData)
 	templateName = templateName + r.templateSuffix
 
 	maps.Copy(combinedData, data)
