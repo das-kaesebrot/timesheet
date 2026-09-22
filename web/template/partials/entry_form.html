@@ -67,8 +67,8 @@
 <div class="mb-3 input-group">
     <span class="input-group-text">Start</span>
     <button class="btn btn-outline-secondary" id="button-start-now" type="button">~Now</button>
-    <button class="btn btn-outline-secondary" id="button-start-dec" type="button">-{{.User.TimesheetGranularity}}</button>
-    <button class="btn btn-outline-secondary" id="button-start-inc" type="button">+{{.User.TimesheetGranularity}}</button>
+    <button class="btn btn-outline-secondary" id="button-start-dec" type="button">-{{formatDurationCompressed .User.TimesheetGranularity}}</button>
+    <button class="btn btn-outline-secondary" id="button-start-inc" type="button">+{{formatDurationCompressed .User.TimesheetGranularity}}</button>
 </div>
 <div class="mb-3 form-floating">
     <input type="datetime-local" name="end" id="input-date-end" class="form-control" step="{{.User.TimesheetGranularity.Seconds}}" value="{{.Entry.End.Format "2006-01-02T15:04"}}" required>
@@ -77,8 +77,8 @@
 <div class="mb-3 input-group">
     <span class="input-group-text">End</span>
     <button class="btn btn-outline-secondary" id="button-end-now" type="button">~Now</button>
-    <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{.User.TimesheetGranularity}}</button>
-    <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{.User.TimesheetGranularity}}</button>
+    <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{formatDurationCompressed .User.TimesheetGranularity}}</button>
+    <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{formatDurationCompressed .User.TimesheetGranularity}}</button>
 </div>
 <div class="mb-3 form-floating">
     <select class="form-select" id="select-timezone" name="timezone">

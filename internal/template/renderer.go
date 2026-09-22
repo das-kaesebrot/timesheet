@@ -38,15 +38,10 @@ func New(dir string, version string) (*Renderer, error) {
 				return t.Format("2006-01-02 15:04")
 			},
 			"formatDuration": func(d time.Duration) string {
-				totalMinutes := math.Round(d.Minutes())
-				prefix := ""
-				absTotalMinutes := math.Abs(totalMinutes)
-				if absTotalMinutes != totalMinutes {
-					prefix = "-"
-					totalMinutes = absTotalMinutes
-				}
-				hours, minutes := utility.Divmod(int64(totalMinutes), 60)
-				return fmt.Sprintf("%s%02dh%02dm", prefix, hours, minutes)
+				return getFormattedDuration(d, false)
+			},
+			"formatDurationCompressed": func(d time.Duration) string {
+				return getFormattedDuration(d, true)
 			},
 			"add": func(a, b int) int {
 				return a + b
@@ -89,6 +84,21 @@ func New(dir string, version string) (*Renderer, error) {
 	r.version = version
 
 	return r, nil
+}
+
+func getFormattedDuration(d time.Duration, compressed bool) string {
+	totalMinutes := math.Round(d.Minutes())
+	prefix := ""
+	absTotalMinutes := math.Abs(totalMinutes)
+	if absTotalMinutes != totalMinutes {
+		prefix = "-"
+		totalMinutes = absTotalMinutes
+	}
+	hours, minutes := utility.Divmod(int64(totalMinutes), 60)
+	if compressed && hours == 0 {
+		return fmt.Sprintf("%s%02dm", prefix, minutes)
+	}
+	return fmt.Sprintf("%s%02dh%02dm", prefix, hours, minutes)
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, name string, data interface{}) {
