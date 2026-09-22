@@ -35,7 +35,7 @@
         document.getElementById("button-start-now").addEventListener("click", () => { setNow("input-date-start"); });
         document.getElementById("button-start-dec").addEventListener("click", () => { decrement("input-date-start"); });
         document.getElementById("button-start-inc").addEventListener("click", () => { increment("input-date-start"); });
-        document.getElementById("button-end-now").addEventListener("click", () => { setNow("input-date-end"); });
+        document.getElementById("button-end-from-start").addEventListener("click", () => { document.getElementById("input-date-end").value = document.getElementById("input-date-start").value; });
         document.getElementById("button-end-dec").addEventListener("click", () => { decrement("input-date-end"); });
         document.getElementById("button-end-inc").addEventListener("click", () => { increment("input-date-end"); });
     };
@@ -76,7 +76,7 @@
 </div>
 <div class="mb-3 input-group">
     <span class="input-group-text">End</span>
-    <button class="btn btn-outline-secondary" id="button-end-now" type="button">~Now</button>
+    <button class="btn btn-outline-secondary" id="button-end-from-start" type="button">=Start</button>
     <button class="btn btn-outline-secondary" id="button-end-dec" type="button">-{{formatDurationCompressed .User.TimesheetGranularity}}</button>
     <button class="btn btn-outline-secondary" id="button-end-inc" type="button">+{{formatDurationCompressed .User.TimesheetGranularity}}</button>
 </div>
