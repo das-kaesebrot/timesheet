@@ -67,8 +67,7 @@ func (h *Handler) GetUsersList(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return httperror.InternalServerError(err)
 	}
-	h.renderer.Render(w, "users_list", map[string]interface{}{"Users": users})
-	return nil
+	return h.renderer.Render(w, "users_list", map[string]interface{}{"Users": users})
 }
 
 func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error {
@@ -157,7 +156,7 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	h.renderer.Render(w, "users_show", map[string]interface{}{
+	return h.renderer.Render(w, "users_show", map[string]interface{}{
 		"User":               user,
 		"Summaries":          pageSummaries,
 		"TotalTimeLogged":    totalTimeLogged,
@@ -169,12 +168,10 @@ func (h *Handler) GetUserOverview(w http.ResponseWriter, r *http.Request) error 
 		"TotalSummaries":     totalSummaries,
 		"Now":                time.Now(),
 	})
-	return nil
 }
 
 func (h *Handler) GetUserNew(w http.ResponseWriter, r *http.Request) error {
-	h.renderer.Render(w, "users_new", map[string]interface{}{})
-	return nil
+	return h.renderer.Render(w, "users_new", map[string]interface{}{})
 }
 
 func (h *Handler) PostUserNew(w http.ResponseWriter, r *http.Request) error {
@@ -207,8 +204,7 @@ func (h *Handler) GetUserEdit(w http.ResponseWriter, r *http.Request) error {
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user})
-	return nil
+	return h.renderer.Render(w, "users_edit", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) PostUserUpdate(w http.ResponseWriter, r *http.Request) error {
@@ -276,8 +272,7 @@ func (h *Handler) GetEntryNew(w http.ResponseWriter, r *http.Request) error {
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user})
-	return nil
+	return h.renderer.Render(w, "entries_new", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) error {
@@ -291,8 +286,7 @@ func (h *Handler) GetEntryNewQuick(w http.ResponseWriter, r *http.Request) error
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user})
-	return nil
+	return h.renderer.Render(w, "entries_new_quick", map[string]interface{}{"User": user})
 }
 
 func (h *Handler) PostEntryNew(w http.ResponseWriter, r *http.Request) error {
@@ -383,8 +377,7 @@ func (h *Handler) GetEntryEdit(w http.ResponseWriter, r *http.Request) error {
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	h.renderer.Render(w, "entries_edit", map[string]interface{}{"User": user, "Entry": entry})
-	return nil
+	return h.renderer.Render(w, "entries_edit", map[string]interface{}{"User": user, "Entry": entry})
 }
 
 func (h *Handler) PostEntryUpdate(w http.ResponseWriter, r *http.Request) error {
@@ -519,8 +512,7 @@ func (h *Handler) GetImportEntries(w http.ResponseWriter, r *http.Request) error
 		return httperror.New(http.StatusNotFound, "User not found", err)
 	}
 
-	h.renderer.Render(w, "entries_import", map[string]interface{}{"User": user, "CSVMimeTypes": validCsvMimeTypes})
-	return nil
+	return h.renderer.Render(w, "entries_import", map[string]interface{}{"User": user, "CSVMimeTypes": validCsvMimeTypes})
 }
 
 func (h *Handler) ImportEntriesToUser(w http.ResponseWriter, r *http.Request) error {
